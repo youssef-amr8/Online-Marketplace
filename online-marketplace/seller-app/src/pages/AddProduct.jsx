@@ -1,115 +1,119 @@
-import { useState } from "react";
-import categories from "../../shared/constants/categories";
+import React, { useState } from "react";
 
-export default function AddProduct() {
-  const [form, setForm] = useState({
-    name: "",
-    price: "",
-    description: "",
-    condition: "new",
-    location: "",
-    payment: "cash",
-    category: ""
-  });
+const AddProduct = () => {
+    const categories = [
+        {
+            name: "Electronics",
+            subcategories: ["Mobiles", "Laptops", "Headphones"]
+        },
+        {
+            name: "Clothing",
+            subcategories: ["Men", "Women", "Kids"]
+        },
+        {
+            name: "Home",
+            subcategories: ["Furniture", "Kitchen", "Decor"]
+        }
+    ];
 
-  function handleChange(e) {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  }
+    const [formData, setFormData] = useState({
+        mainCategory: "",
+        subCategory: "",
+        otherCategory: ""
+    });
 
-  function handleSubmit(e) {
-    e.preventDefault();
-    console.log("Submitting Product", form);
-  }
+    const handleMainCategoryChange = (e) => {
+        const value = e.target.value;
+        setFormData({
+            ...formData,
+            mainCategory: value,
+            subCategory: "",
+            otherCategory: ""
+        });
+    };
 
-  return (
-    <div className="add-product-container">
-      <h2>Add Product</h2>
+    const handleSubCategoryChange = (e) => {
+        setFormData({
+            ...formData,
+            subCategory: e.target.value
+        });
+    };
 
-      <form onSubmit={handleSubmit}>
-        
-        <div className="form-group">
-          <label className="form-label">Category</label>
-          <select
-            className="form-select"
-            name="category"
-            onChange={handleChange}
-            required
-          >
-            <option value="">Select category</option>
-            {categories.map((cat) => (
-              <option key={cat} value={cat}>{cat}</option>
-            ))}
-          </select>
-        </div>
+    const handleOtherChange = (e) => {
+        setFormData({
+            ...formData,
+            otherCategory: e.target.value
+        });
+    };
 
-        <div className="form-group">
-          <label className="form-label">Product Name</label>
-          <input
-            type="text"
-            className="form-input"
-            name="name"
-            onChange={handleChange}
-            required
-          />
-        </div>
+    return (
+        <form className="add-product-form">
 
-        <div className="form-group">
-          <label className="form-label">Price</label>
-          <input
-            type="number"
-            className="form-input"
-            name="price"
-            onChange={handleChange}
-            required
-          />
-        </div>
+            {/* MAIN CATEGORY DROPDOWN */}
+            <div className="form-group">
+                <label className="form-label">Main Category</label>
+                <select
+                    className="form-select"
+                    name="mainCategory"
+                    value={formData.mainCategory}
+                    onChange={handleMainCategoryChange}
+                    required
+                >
+                    <option value="">Select main category</option>
 
-        <div className="form-group">
-          <label className="form-label">Description</label>
-          <textarea
-            className="form-textarea"
-            name="description"
-            onChange={handleChange}
-          />
-        </div>
+                    {categories.map((cat) => (
+                        <option key={cat.name} value={cat.name}>
+                            {cat.name}
+                        </option>
+                    ))}
 
-        <div className="form-group">
-          <label className="form-label">Condition</label>
-          <select
-            className="form-select"
-            name="condition"
-            onChange={handleChange}
-          >
-            <option value="new">New</option>
-            <option value="used">Used</option>
-          </select>
-        </div>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
 
-        <div className="form-group">
-          <label className="form-label">Location</label>
-          <input
-            className="form-input"
-            name="location"
-            onChange={handleChange}
-          />
-        </div>
+            {/* SUB CATEGORY DROPDOWN — SHOW ONLY IF MAIN CATEGORY IS NOT EMPTY/OTHER */}
+            {formData.mainCategory &&
+                formData.mainCategory !== "Other" && (
+                    <div className="form-group">
+                        <label className="form-label">Sub Category</label>
+                        <select
+                            className="form-select"
+                            name="subCategory"
+                            value={formData.subCategory}
+                            onChange={handleSubCategoryChange}
+                            required
+                        >
+                            <option value="">Choose subcategory</option>
 
-        <div className="form-group">
-          <label className="form-label">Payment Method</label>
-          <select
-            className="form-select"
-            name="payment"
-            onChange={handleChange}
-          >
-            <option value="cash">Cash</option>
-            <option value="installment">Installment</option>
-          </select>
-        </div>
+                            {categories
+                                .find(
+                                    (cat) => cat.name === formData.mainCategory
+                                )
+                                .subcategories.map((sub) => (
+                                    <option key={sub} value={sub}>
+                                        {sub}
+                                    </option>
+                                ))}
+                        </select>
+                    </div>
+                )}
 
-        <button className="btn-submit" type="submit">
-          Add Product
-        </button>
-      </form>
-    </div>
-  );
-}
+            {/* OTHER CATEGORY TEXT INPUT */}
+            {formData.mainCategory === "Other" && (
+                <div className="form-group">
+                    <label className="form-label">Enter Category</label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Write your category"
+                        value={formData.otherCategory}
+                        onChange={handleOtherChange}
+                        required
+                    />
+                </div>
+            )}
+        </form>
+    );
+};
+
+export default AddProduct;
