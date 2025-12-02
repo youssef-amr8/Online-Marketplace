@@ -1,119 +1,119 @@
-import React, { useState } from "react";
+import Sidebar from "../components/Sidebar";
+import { useState } from "react";
+import categories from "../utils/categories";
 
-const AddProduct = () => {
-    const categories = [
-        {
-            name: "Electronics",
-            subcategories: ["Mobiles", "Laptops", "Headphones"]
-        },
-        {
-            name: "Clothing",
-            subcategories: ["Men", "Women", "Kids"]
-        },
-        {
-            name: "Home",
-            subcategories: ["Furniture", "Kitchen", "Decor"]
-        }
-    ];
 
-    const [formData, setFormData] = useState({
-        mainCategory: "",
-        subCategory: "",
-        otherCategory: ""
-    });
+function AddProduct() {
+  const [products, setProducts] = useState([]);
+  const [name, setName] = useState("");
+  const [price, setPrice] = useState("");
+  const [category, setCategory] = useState("");
+  const [subcategory, setSubcategory] = useState("");
 
-    const handleMainCategoryChange = (e) => {
-        const value = e.target.value;
-        setFormData({
-            ...formData,
-            mainCategory: value,
-            subCategory: "",
-            otherCategory: ""
-        });
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!name || !price || !category || !subcategory) return;
+
+    const newProduct = {
+      id: Date.now(),
+      name,
+      price: parseFloat(price).toFixed(2),
+      category,
+      subcategory,
     };
 
-    const handleSubCategoryChange = (e) => {
-        setFormData({
-            ...formData,
-            subCategory: e.target.value
-        });
-    };
+    setProducts([...products, newProduct]);
+    setName("");
+    setPrice("");
+    setCategory("");
+    setSubcategory("");
+  };
 
-    const handleOtherChange = (e) => {
-        setFormData({
-            ...formData,
-            otherCategory: e.target.value
-        });
-    };
+  const selectedSubcategories = categories.find((c) => c.name === category)?.subcategories || [];
 
-    return (
-        <form className="add-product-form">
+  return (
+    <div style={{ display: "flex", minHeight: "100vh" }}>
+      <Sidebar />
+      <div style={{ flex: 1, padding: "20px" }}>
+        <h1>Add Product</h1>
 
-            {/* MAIN CATEGORY DROPDOWN */}
-            <div className="form-group">
-                <label className="form-label">Main Category</label>
-                <select
-                    className="form-select"
-                    name="mainCategory"
-                    value={formData.mainCategory}
-                    onChange={handleMainCategoryChange}
-                    required
-                >
-                    <option value="">Select main category</option>
+        <form
+          onSubmit={handleSubmit}
+          style={{
+            marginTop: "20px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "10px",
+            maxWidth: "400px",
+          }}
+        >
+          <input
+            type="text"
+            placeholder="Product Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
 
-                    {categories.map((cat) => (
-                        <option key={cat.name} value={cat.name}>
-                            {cat.name}
-                        </option>
-                    ))}
+          <input
+            type="number"
+            placeholder="Price"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            required
+          />
 
-                    <option value="Other">Other</option>
-                </select>
-            </div>
+          <select
+            value={category}
+            onChange={(e) => {
+              setCategory(e.target.value);
+              setSubcategory("");
+            }}
+            required
+          >
+            <option value="">Select Category</option>
+            {categories.map((c) => (
+              <option key={c.name} value={c.name}>
+                {c.name}
+              </option>
+            ))}
+          </select>
 
-            {/* SUB CATEGORY DROPDOWN — SHOW ONLY IF MAIN CATEGORY IS NOT EMPTY/OTHER */}
-            {formData.mainCategory &&
-                formData.mainCategory !== "Other" && (
-                    <div className="form-group">
-                        <label className="form-label">Sub Category</label>
-                        <select
-                            className="form-select"
-                            name="subCategory"
-                            value={formData.subCategory}
-                            onChange={handleSubCategoryChange}
-                            required
-                        >
-                            <option value="">Choose subcategory</option>
+          <select
+            value={subcategory}
+            onChange={(e) => setSubcategory(e.target.value)}
+            required
+            disabled={!category}
+          >
+            <option value="">Select Subcategory</option>
+            {selectedSubcategories.map((sub) => (
+              <option key={sub} value={sub}>
+                {sub}
+              </option>
+            ))}
+          </select>
 
-                            {categories
-                                .find(
-                                    (cat) => cat.name === formData.mainCategory
-                                )
-                                .subcategories.map((sub) => (
-                                    <option key={sub} value={sub}>
-                                        {sub}
-                                    </option>
-                                ))}
-                        </select>
-                    </div>
-                )}
-
-            {/* OTHER CATEGORY TEXT INPUT */}
-            {formData.mainCategory === "Other" && (
-                <div className="form-group">
-                    <label className="form-label">Enter Category</label>
-                    <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Write your category"
-                        value={formData.otherCategory}
-                        onChange={handleOtherChange}
-                        required
-                    />
-                </div>
-            )}
+          <button type="submit" style={{ background: "#007bff", color: "#fff", padding: "10px", border: "none", borderRadius: "5px" }}>
+            Add Product
+          </button>
         </form>
-    );
-};
+
+        {products.length > 0 && (
+          <div style={{ marginTop: "30px" }}>
+            <h2>Products Added</h2>
+            <ul style={{ padding: 0, listStyle: "none" }}>
+              {products.map((p) => (
+                <li key={p.id} style={{ padding: "10px", marginBottom: "10px", background: "#f5f5f5", borderRadius: "5px" }}>
+                  <strong>{p.name}</strong> - ${p.price} <br />
+                  <em>{p.category} / {p.subcategory}</em>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default AddProduct;
