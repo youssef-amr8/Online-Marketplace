@@ -2,97 +2,73 @@ const categories = [
   {
     name: "Electronics",
     subcategories: [
-      "Mobiles & Tablets",
-      "Laptops & Computers",
-      "TVs & Home Entertainment",
-      "Cameras & Accessories",
-      "Smartwatches & Wearables",
-      "Headphones & Speakers",
-      "Gaming Consoles & Accessories"
+      {
+        name: "Mobiles & Tablets",
+        image: "/images/mobilesAndTablets.png",
+      },
+      {
+        name: "Laptops & Computers",
+        image: "/images/LaptopsAndComputers.png",
+      },
+      {
+        name: "TVs & Home Entertainment",
+        image: "/images/TVsAndHomeEntertainment.png",
+      },
+      {
+        name: "Cameras & Accessories",
+        image: "/images/Cameras&Accessories.png",
+      },
+      {
+        name: "Smartwatches & Wearables",
+        image: "/images/SmartWatches&Wearables.png",
+      },
+      {
+        name: "Headphones & Speakers",
+        image: "/images/HeadPhones&Speakers.png",
+      },
+      {
+        name: "Gaming Consoles & Accessories",
+        image: "/images/GamingConsoles&Accessories.png",
+      }
     ]
   },
-  {
-    name: "Fashion",
-    subcategories: [
-      "Women's Fashion - Clothing",
-      "Women's Fashion - Shoes & Sandals",
-      "Women's Fashion - Bags & Accessories",
-      "Women's Fashion - Jewelry & Watches",
 
-      "Men's Fashion - Clothing",
-      "Men's Fashion - Shoes & Sneakers",
-      "Men's Fashion - Wallets & Belts",
-      "Men's Fashion - Watches & Accessories",
-
-      "Kids & Baby - Clothing",
-      "Kids & Baby - Toys & Games",
-      "Kids & Baby - School Bags & Accessories"
-    ]
-  },
-  {
-    name: "Beauty & Personal Care",
-    subcategories: [
-      "Skincare",
-      "Makeup",
-      "Haircare",
-      "Fragrances",
-      "Bath & Body",
-      "Health & Wellness"
-    ]
-  },
-  {
-    name: "Home & Kitchen",
-    subcategories: [
-      "Furniture",
-      "Kitchen Appliances",
-      "Cookware & Dining",
-      "Home Décor",
-      "Storage & Organization",
-      "Cleaning Supplies"
-    ]
-  },
   {
     name: "Supermarket & Grocery",
     subcategories: [
-      "Fresh Food",
-      "Snacks & Beverages",
-      "Pantry Staples",
-      "Cleaning & Household Essentials",
-      "Pet Supplies"
+      { name: "Fresh Food", image: "/images/FreshFood.png" },
+      { name: "Snacks & Beverages", image: "/images/Snacks&Bevereges.png" },
+      { name: "Pantry Staples", image: "/images/PantryStaples.png" },
+      { name: "Cleaning & Household Essentials", image: "/images/Cleaning&HouseholdEssentials.png" },
+      { name: "Pet Supplies", image: "/images/PetSupplies.png" }
     ]
   },
+
   {
     name: "Sports & Outdoors",
     subcategories: [
-      "Fitness Equipment",
-      "Sportswear",
-      "Camping & Hiking Gear",
-      "Bicycles & Accessories"
+      { name: "Fitness Equipment", image: "/images/FitnessEquipments.png" },
+      { name: "Sportswear", image: "/images/SportsWear.png" },
+      { name: "Camping & Hiking Gear", image: "/images/Camping&HikingGear.png" },
+      { name: "Bicycles & Accessories", image: "/images/Bicycles&Accessories.png" }
     ]
   },
+
   {
     name: "Books & Stationery",
     subcategories: [
-      "Books",
-      "Office Supplies",
-      "Art & Craft Materials"
+      { name: "Books", image: "/images/Books.png" },
+      { name: "Office Supplies", image: "/images/OfficeSupplies.png" },
+      { name: "Art & Craft Materials", image: "/images/Art&CraftMaterials.png" }
     ]
   },
-  {
-    name: "Toys & Games",
-    subcategories: [
-      "Action Figures",
-      "Educational Toys",
-      "Board Games & Puzzles",
-      "Dolls & Stuffed Animals"
-    ]
-  },
+
   {
     name: "Health & Medical",
     subcategories: [
-      "Supplements & Vitamins",
-      "Medical Devices",
-      "Personal Care Equipment"
+      { name: "Supplements & Vitamins", image: "/images/Supplements&Vitamins.png" },
+      { name: "Medical Devices", image: "/images/MedicalDevices.png" },
+      { name: "Personal Care Equipment", image: "/images/PersonalCareEquipment.png" }
     ]
   }
 ];

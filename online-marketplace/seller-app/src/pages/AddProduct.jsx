@@ -2,113 +2,111 @@ import Sidebar from "../components/Sidebar";
 import { useState } from "react";
 import categories from "../utils/categories";
 
-
 function AddProduct() {
-  const [products, setProducts] = useState([]);
-  const [name, setName] = useState("");
-  const [price, setPrice] = useState("");
   const [category, setCategory] = useState("");
-  const [subcategory, setSubcategory] = useState("");
+  const [selectedSubcategory, setSelectedSubcategory] = useState(null);
+  const [addedProducts, setAddedProducts] = useState([]);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!name || !price || !category || !subcategory) return;
-
+  const handleSubcategoryClick = (sub) => {
+    // Add product automatically on subcategory click
     const newProduct = {
       id: Date.now(),
-      name,
-      price: parseFloat(price).toFixed(2),
       category,
-      subcategory,
+      subcategory: sub.name,
+      image: sub.image,
     };
-
-    setProducts([...products, newProduct]);
-    setName("");
-    setPrice("");
-    setCategory("");
-    setSubcategory("");
+    setAddedProducts([...addedProducts, newProduct]);
+    setSelectedSubcategory(sub.name);
   };
 
-  const selectedSubcategories = categories.find((c) => c.name === category)?.subcategories || [];
+  const selectedCategory = categories.find((c) => c.name === category);
+  const subcategories = selectedCategory?.subcategories || [];
 
   return (
     <div style={{ display: "flex", minHeight: "100vh" }}>
       <Sidebar />
+
       <div style={{ flex: 1, padding: "20px" }}>
         <h1>Add Product</h1>
 
-        <form
-          onSubmit={handleSubmit}
-          style={{
-            marginTop: "20px",
-            display: "flex",
-            flexDirection: "column",
-            gap: "10px",
-            maxWidth: "400px",
-          }}
-        >
-          <input
-            type="text"
-            placeholder="Product Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
+        {/* Category Buttons */}
+        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "20px" }}>
+          {categories.map((c) => (
+            <button
+              key={c.name}
+              onClick={() => {
+                setCategory(c.name);
+                setSelectedSubcategory(null);
+              }}
+              style={{
+                padding: "10px 15px",
+                border: category === c.name ? "2px solid #007bff" : "1px solid #ccc",
+                background: category === c.name ? "#e0f0ff" : "#fff",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
+              {c.name}
+            </button>
+          ))}
+        </div>
 
-          <input
-            type="number"
-            placeholder="Price"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            required
-          />
+        {/* Subcategory Boxes */}
+        {category && (
+          <div style={{ marginTop: "30px" }}>
+            <h2>{category} Subcategories</h2>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "20px", marginTop: "10px" }}>
+              {subcategories.map((sub) => (
+                <div
+                  key={sub.name}
+                  onClick={() => handleSubcategoryClick(sub)}
+                  style={{
+                    width: "180px",
+                    textAlign: "center",
+                    border: selectedSubcategory === sub.name ? "2px solid #007bff" : "1px solid #ccc",
+                    borderRadius: "5px",
+                    padding: "10px",
+                    cursor: "pointer",
+                  }}
+                >
+                  <img
+                    src={sub.image}
+                    alt={sub.name}
+                    style={{ width: "100%", height: "120px", objectFit: "cover", marginBottom: "5px" }}
+                  />
+                  <p>{sub.name}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
-          <select
-            value={category}
-            onChange={(e) => {
-              setCategory(e.target.value);
-              setSubcategory("");
-            }}
-            required
-          >
-            <option value="">Select Category</option>
-            {categories.map((c) => (
-              <option key={c.name} value={c.name}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={subcategory}
-            onChange={(e) => setSubcategory(e.target.value)}
-            required
-            disabled={!category}
-          >
-            <option value="">Select Subcategory</option>
-            {selectedSubcategories.map((sub) => (
-              <option key={sub} value={sub}>
-                {sub}
-              </option>
-            ))}
-          </select>
-
-          <button type="submit" style={{ background: "#007bff", color: "#fff", padding: "10px", border: "none", borderRadius: "5px" }}>
-            Add Product
-          </button>
-        </form>
-
-        {products.length > 0 && (
+        {/* Added Products List */}
+        {addedProducts.length > 0 && (
           <div style={{ marginTop: "30px" }}>
             <h2>Products Added</h2>
-            <ul style={{ padding: 0, listStyle: "none" }}>
-              {products.map((p) => (
-                <li key={p.id} style={{ padding: "10px", marginBottom: "10px", background: "#f5f5f5", borderRadius: "5px" }}>
-                  <strong>{p.name}</strong> - ${p.price} <br />
-                  <em>{p.category} / {p.subcategory}</em>
-                </li>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
+              {addedProducts.map((p) => (
+                <div
+                  key={p.id}
+                  style={{
+                    width: "150px",
+                    border: "1px solid #ccc",
+                    borderRadius: "5px",
+                    textAlign: "center",
+                    padding: "10px",
+                  }}
+                >
+                  <img
+                    src={p.image}
+                    alt={p.subcategory}
+                    style={{ width: "100%", height: "100px", objectFit: "cover", marginBottom: "5px" }}
+                  />
+                  <p>{p.category}</p>
+                  <p><strong>{p.subcategory}</strong></p>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
         )}
       </div>
