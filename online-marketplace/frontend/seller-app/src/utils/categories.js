@@ -4,7 +4,7 @@ const categories = [
     subcategories: [
       {
         name: "Mobiles & Tablets",
-        image: "/images/mobilesAndTablets.png",
+        image: "/images/iPhone-and-iPad-.png",
       },
       {
         name: "Laptops & Computers",
