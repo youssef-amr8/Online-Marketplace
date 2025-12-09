@@ -4,28 +4,48 @@ import categories from "../utils/categories";
 
 function AddProduct() {
   const [category, setCategory] = useState("");
-  const [selectedSubcategory, setSelectedSubcategory] = useState(null);
+  const [subcategories, setSubcategories] = useState([]);
   const [addedProducts, setAddedProducts] = useState([]);
+  const [activeSubcategory, setActiveSubcategory] = useState(null); // for modal/form
 
-  const handleSubcategoryClick = (sub) => {
-    // Add product automatically on subcategory click
+  // Form state
+  const [productName, setProductName] = useState("");
+  const [price, setPrice] = useState("");
+  const [stock, setStock] = useState("");
+  const [image, setImage] = useState(null);
+
+  const selectedCategory = categories.find((c) => c.name === category);
+  const subcategoriesList = selectedCategory?.subcategories || [];
+
+  const openForm = (sub) => {
+    setActiveSubcategory(sub);
+    setProductName("");
+    setPrice("");
+    setStock("");
+    setImage(null);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!productName || !price || !stock) return;
+
     const newProduct = {
       id: Date.now(),
       category,
-      subcategory: sub.name,
-      image: sub.image,
+      subcategory: activeSubcategory.name,
+      image: image ? URL.createObjectURL(image) : activeSubcategory.image,
+      name: productName,
+      price: parseFloat(price).toFixed(2),
+      stock: parseInt(stock),
     };
-    setAddedProducts([...addedProducts, newProduct]);
-    setSelectedSubcategory(sub.name);
-  };
 
-  const selectedCategory = categories.find((c) => c.name === category);
-  const subcategories = selectedCategory?.subcategories || [];
+    setAddedProducts([...addedProducts, newProduct]);
+    setActiveSubcategory(null); // close form
+  };
 
   return (
     <div style={{ display: "flex", minHeight: "100vh" }}>
       <Sidebar />
-
       <div style={{ flex: 1, padding: "20px" }}>
         <h1>Add Product</h1>
 
@@ -34,10 +54,7 @@ function AddProduct() {
           {categories.map((c) => (
             <button
               key={c.name}
-              onClick={() => {
-                setCategory(c.name);
-                setSelectedSubcategory(null);
-              }}
+              onClick={() => setCategory(c.name)}
               style={{
                 padding: "10px 15px",
                 border: category === c.name ? "2px solid #007bff" : "1px solid #ccc",
@@ -56,14 +73,14 @@ function AddProduct() {
           <div style={{ marginTop: "30px" }}>
             <h2>{category} Subcategories</h2>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "20px", marginTop: "10px" }}>
-              {subcategories.map((sub) => (
+              {subcategoriesList.map((sub) => (
                 <div
                   key={sub.name}
-                  onClick={() => handleSubcategoryClick(sub)}
+                  onClick={() => openForm(sub)}
                   style={{
                     width: "180px",
                     textAlign: "center",
-                    border: selectedSubcategory === sub.name ? "2px solid #007bff" : "1px solid #ccc",
+                    border: "1px solid #ccc",
                     borderRadius: "5px",
                     padding: "10px",
                     cursor: "pointer",
@@ -81,7 +98,78 @@ function AddProduct() {
           </div>
         )}
 
-        {/* Added Products List */}
+        {/* Modal Form */}
+        {activeSubcategory && (
+          <div
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              background: "rgba(0,0,0,0.5)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 1000,
+            }}
+          >
+            <form
+              onSubmit={handleSubmit}
+              style={{
+                background: "#fff",
+                padding: "20px",
+                borderRadius: "8px",
+                width: "400px",
+                display: "flex",
+                flexDirection: "column",
+                gap: "10px",
+              }}
+            >
+              <h2>Add Product to {activeSubcategory.name}</h2>
+              <input
+                type="text"
+                placeholder="Product Name"
+                value={productName}
+                onChange={(e) => setProductName(e.target.value)}
+                required
+              />
+              <input
+                type="number"
+                placeholder="Price"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                required
+              />
+              <input
+                type="number"
+                placeholder="Available Stock"
+                value={stock}
+                onChange={(e) => setStock(e.target.value)}
+                required
+              />
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setImage(e.target.files[0])}
+              />
+              <div style={{ display: "flex", justifyContent: "space-between", marginTop: "10px" }}>
+                <button type="submit" style={{ padding: "10px", background: "#007bff", color: "#fff", border: "none", borderRadius: "5px" }}>
+                  Add Product
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveSubcategory(null)}
+                  style={{ padding: "10px", background: "#ccc", color: "#000", border: "none", borderRadius: "5px" }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {/* Added Products */}
         {addedProducts.length > 0 && (
           <div style={{ marginTop: "30px" }}>
             <h2>Products Added</h2>
@@ -99,11 +187,13 @@ function AddProduct() {
                 >
                   <img
                     src={p.image}
-                    alt={p.subcategory}
+                    alt={p.name}
                     style={{ width: "100%", height: "100px", objectFit: "cover", marginBottom: "5px" }}
                   />
                   <p>{p.category}</p>
                   <p><strong>{p.subcategory}</strong></p>
+                  <p>${p.price}</p>
+                  <p>Stock: {p.stock}</p>
                 </div>
               ))}
             </div>

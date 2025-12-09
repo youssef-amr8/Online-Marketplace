@@ -1,91 +1,104 @@
 import Sidebar from "../components/Sidebar";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 function Dashboard() {
-  // Example data
-  const recentOrders = [
-    { id: 1, product: "Tennis Racket", customer: "John Doe", amount: "$120", status: "Shipped" },
-    { id: 2, product: "Tennis Balls", customer: "Jane Smith", amount: "$30", status: "Pending" },
-    { id: 3, product: "Shoes", customer: "Mike Brown", amount: "$80", status: "Delivered" },
-  ];
+  // Temporary frontend values — dynamic later with backend
+  const [stats] = useState({
+    totalProducts: 12,
+    pendingOrders: 5,
+    salesCompleted: 48,
+    revenue: 2350, // You can remove if not needed
+  });
+
+  const [recentSales] = useState([
+    { id: 1, product: "Gaming Mouse", buyer: "Omar Khaled", amount: 45 },
+    { id: 2, product: "PS5 Controller", buyer: "Laila Samir", amount: 60 },
+    { id: 3, product: "Nintendo Switch Case", buyer: "Youssef Ali", amount: 22 },
+    { id: 4, product: "Gaming Headset", buyer: "Mona Adel", amount: 80 },
+  ]);
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
+    <div style={{ display: "flex", background: "#f5f7fa", minHeight: "100vh" }}>
       <Sidebar />
-      <div style={{ flex: 1, padding: "20px", background: "#f9f9f9" }}>
-        <h1>Seller Dashboard</h1>
-        <p>Welcome to your seller dashboard!</p>
 
-        {/* Top Stats */}
-        <div style={{ display: "flex", gap: "20px", marginTop: "20px" }}>
-          <div style={{ padding: "20px", background: "#fff", flex: 1, borderRadius: "8px", boxShadow: "0 0 5px rgba(0,0,0,0.1)" }}>
-            <h2>Products</h2>
-            <p>10</p>
-          </div>
-          <div style={{ padding: "20px", background: "#fff", flex: 1, borderRadius: "8px", boxShadow: "0 0 5px rgba(0,0,0,0.1)" }}>
-            <h2>Orders</h2>
-            <p>5</p>
-          </div>
-          <div style={{ padding: "20px", background: "#fff", flex: 1, borderRadius: "8px", boxShadow: "0 0 5px rgba(0,0,0,0.1)" }}>
-            <h2>Revenue</h2>
-            <p>$200</p>
-          </div>
+      <div style={{ padding: "30px", flex: 1 }}>
+        <h1>Dashboard</h1>
+        <p>Overview of your store performance.</p>
+
+        {/* --- Stats Cards --- */}
+        <div style={{ display: "flex", gap: "20px", marginTop: "20px", flexWrap: "wrap" }}>
+          {[
+            { label: "Total Listings", value: stats.totalProducts },
+            { label: "Pending Orders", value: stats.pendingOrders },
+            { label: "Sales Completed", value: stats.salesCompleted },
+            { label: "Revenue", value: "$" + stats.revenue.toLocaleString() }
+          ].map((card, index) => (
+            <div key={index}
+              style={{
+                background: "#fff",
+                padding: "25px",
+                borderRadius: "10px",
+                width: "220px",
+                textAlign: "center",
+                boxShadow: "0 0 6px rgba(0,0,0,0.08)",
+              }}
+            >
+              <h2 style={{ marginBottom: "10px", color: "#007bff" }}>{card.value}</h2>
+              <p style={{ fontWeight: "bold" }}>{card.label}</p>
+            </div>
+          ))}
         </div>
 
-        {/* Quick Actions */}
-        <div style={{ marginTop: "30px" }}>
-          <h2>Quick Actions</h2>
-          <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
-            <Link to="/add-product">
-              <button style={{ padding: "10px 20px", borderRadius: "5px", border: "none", background: "#007bff", color: "#fff", cursor: "pointer" }}>
-                Add Product
-              </button>
-            </Link>
-            <Link to="/orders">
-              <button style={{ padding: "10px 20px", borderRadius: "5px", border: "none", background: "#28a745", color: "#fff", cursor: "pointer" }}>
-                View Orders
-              </button>
-            </Link>
-          </div>
+        {/* --- Quick Action Buttons --- */}
+        <h2 style={{ marginTop: "40px" }}>Quick Actions</h2>
+        <div style={{ display: "flex", gap: "20px", marginTop: "15px", flexWrap: "wrap" }}>
+          <Link to="/add-product" style={buttonStyle}>➕ Add Product</Link>
+          <Link to="/your-listings" style={buttonStyle}>📦 Your Listings</Link>
+          <Link to="/pending-orders" style={buttonStyle}>🕒 Pending Orders</Link>
+          <Link to="/history" style={buttonStyle}>📜 Sales History</Link>
         </div>
 
-        {/* Recent Orders Table */}
-        <div style={{ marginTop: "30px" }}>
-          <h2>Recent Orders</h2>
-          <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "10px" }}>
-            <thead>
-              <tr style={{ background: "#eee" }}>
-                <th style={{ padding: "10px", textAlign: "left" }}>Order ID</th>
-                <th style={{ padding: "10px", textAlign: "left" }}>Product</th>
-                <th style={{ padding: "10px", textAlign: "left" }}>Customer</th>
-                <th style={{ padding: "10px", textAlign: "left" }}>Amount</th>
-                <th style={{ padding: "10px", textAlign: "left" }}>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {recentOrders.map(order => (
-                <tr key={order.id} style={{ borderBottom: "1px solid #ddd" }}>
-                  <td style={{ padding: "10px" }}>{order.id}</td>
-                  <td style={{ padding: "10px" }}>{order.product}</td>
-                  <td style={{ padding: "10px" }}>{order.customer}</td>
-                  <td style={{ padding: "10px" }}>{order.amount}</td>
-                  <td style={{ padding: "10px" }}>{order.status}</td>
+        {/* --- Recent Sales Section --- */}
+        <h2 style={{ marginTop: "50px" }}>Recent Sales</h2>
+        <div style={{ background: "#fff", marginTop: "10px", padding: "20px", borderRadius: "10px", boxShadow: "0 0 6px rgba(0,0,0,0.08)" }}>
+          {recentSales.length === 0 ? (
+            <p>No recent sales.</p>
+          ) : (
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <thead>
+                <tr style={{ textAlign: "left", borderBottom: "2px solid #e1e1e1" }}>
+                  <th>Product</th>
+                  <th>Buyer</th>
+                  <th>Amount</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Placeholder for Charts (Optional) */}
-        <div style={{ marginTop: "30px" }}>
-          <h2>Sales Overview</h2>
-          <div style={{ height: "200px", background: "#fff", borderRadius: "8px", boxShadow: "0 0 5px rgba(0,0,0,0.1)", display: "flex", alignItems: "center", justifyContent: "center", color: "#999" }}>
-            Chart placeholder
-          </div>
+              </thead>
+              <tbody>
+                {recentSales.map((sale) => (
+                  <tr key={sale.id} style={{ borderBottom: "1px solid #eee" }}>
+                    <td>{sale.product}</td>
+                    <td>{sale.buyer}</td>
+                    <td>${sale.amount}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>
   );
 }
+
+// Shared button style
+const buttonStyle = {
+  background: "#007bff",
+  padding: "12px 18px",
+  borderRadius: "8px",
+  color: "white",
+  fontWeight: "bold",
+  textDecoration: "none",
+  display: "inline-block"
+};
 
 export default Dashboard;

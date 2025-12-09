@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 
 function Sidebar() {
-  const location = useLocation(); // to highlight active page
+  const location = useLocation(); 
 
   const linkStyle = (path) => ({
     display: "block",
@@ -28,19 +28,31 @@ function Sidebar() {
       <h2 style={{ marginBottom: "30px" }}>Seller Menu</h2>
       <ul style={{ listStyle: "none", padding: 0 }}>
         <li>
-          <Link to="/" style={linkStyle("/")}>
-            Dashboard
+          <Link to="/" style={linkStyle("/")}>Dashboard</Link>
+        </li>
+
+        <li>
+          <Link to="/add-product" style={linkStyle("/add-product")}>Add Product</Link>
+        </li>
+
+        <li>
+          <Link to="/your-listings" style={linkStyle("/your-listings")}>
+            Your Listings
           </Link>
         </li>
+
         <li>
-          <Link to="/add-product" style={linkStyle("/add-product")}>
-            Add Product
+          <Link to="/pending-orders" style={linkStyle("/pending-orders")}>
+            Pending Orders
           </Link>
         </li>
+
         <li>
-          <Link to="/orders" style={linkStyle("/orders")}>
-            Orders
-          </Link>
+ <Link to="/history" style={linkStyle("/history")}>History</Link>
+        </li>
+
+        <li>
+          <Link to="/orders" style={linkStyle("/orders")}>Orders</Link>
         </li>
       </ul>
     </div>
