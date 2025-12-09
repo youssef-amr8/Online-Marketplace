@@ -71,7 +71,7 @@ function AddProduct() {
         {/* Subcategory Boxes */}
         {category && (
           <div style={{ marginTop: "30px" }}>
-            <h2>{category} Subcategories</h2>
+            <h2>{category}</h2>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "20px", marginTop: "10px" }}>
               {subcategoriesList.map((sub) => (
                 <div
