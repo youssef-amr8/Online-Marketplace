@@ -1,7 +1,7 @@
 import Sidebar from "../components/Sidebar";
 import { useState } from "react";
 import OrdersFilterBar from "../components/OrdersFilterBar";
-import BackButton from "../components/BackButton";
+import "./PageStyles.css";
 
 
 function History() {
@@ -77,49 +77,45 @@ function History() {
 
   
 return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
+    <div className="seller-app">
       <Sidebar />
-
-      <div style={{ flex: 1, padding: "20px", background: "#f7f7f7" }}>
-        <BackButton />
-        <OrdersFilterBar onFilterChange={applyFilters} showDateSold={true} />
-
-        <h1>Sales History</h1>
-        
-        <div style={{
-          marginTop: "20px",
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "20px"
-        }}>
-          {filteredOrders.map((order) => (
-            <div key={order.id} style={{
-              width: "240px",
-              background: "#fff",
-              borderRadius: "18px",
-              padding: "12px",
-              boxShadow: "0 12px 22px rgba(17, 24, 39, 0.08)",
-              textAlign: "left",
-            }}>
-              <img src={order.image} style={{
-                width: "100%",
-                height: "130px",
-                objectFit: "cover",
-                borderRadius: "6px"
-              }} />
-
-              <h3>{order.product}</h3>
-
-              <p><b>Category:</b> {order.category}</p>
-              <p><b>Quantity:</b> {order.quantity}</p>
-              <p><b>Price:</b> ${order.price}</p>
-              <p><b>Total:</b> ${(order.price * order.quantity).toFixed(2)}</p>
-              <p><b>Buyer:</b> {order.buyer}</p>
-              <p><b>Date Sold:</b> {order.date}</p>
-            </div>
-          ))}
+      <div className="page-container">
+        <div className="page-header">
+          <h1 className="page-title">
+            <i className="fas fa-history"></i> Sales History
+          </h1>
+          <p className="page-subtitle">View all your completed sales and transactions</p>
         </div>
 
+        <div className="content-card">
+          <OrdersFilterBar onFilterChange={applyFilters} showDateSold={true} />
+        </div>
+        
+        <div className="content-card">
+          {filteredOrders.length === 0 ? (
+            <div className="empty-state">
+              <i className="fas fa-inbox"></i>
+              <p>No sales history found.</p>
+            </div>
+          ) : (
+            <div className="product-grid">
+              {filteredOrders.map((order) => (
+                <div key={order.id} className="product-card">
+                  <img src={order.image} alt={order.product} className="product-image" />
+                  <div className="product-info" style={{ textAlign: "left" }}>
+                    <h3 className="product-name">{order.product}</h3>
+                    <p className="product-stock"><strong>Category:</strong> {order.category}</p>
+                    <p className="product-stock"><strong>Quantity:</strong> {order.quantity}</p>
+                    <p className="product-price">Price: ${order.price}</p>
+                    <p className="product-price">Total: ${(order.price * order.quantity).toFixed(2)}</p>
+                    <p className="product-stock"><strong>Buyer:</strong> {order.buyer}</p>
+                    <p className="product-stock" style={{ fontSize: "12px" }}><strong>Date Sold:</strong> {order.date}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

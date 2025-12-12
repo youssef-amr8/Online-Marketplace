@@ -1,24 +1,50 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import AddProduct from "./pages/AddProduct";
 import YourListings from "./pages/YourListings";
 import PendingOrders from "./pages/PendingOrders";
 import History from "./pages/History";
 import Orders from "./pages/Orders";
+import ProtectedRoute from "./components/ProtectedRoute";
+import "./styles/main.css";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/add-product" element={<AddProduct />} />
-        <Route path="/your-listings" element={<YourListings />} /> 
-        <Route path="/pending-orders" element={<PendingOrders />} />
-        <Route path="/history" element={<History />} />
-        <Route path="/orders" element={<Orders />} />
-        <Route path="/pending-orders" element={<PendingOrders />} />
-        <Route path="/history" element={<History />} />
-
+        <Route path="/login" element={<Login />} />
+        <Route path="/" element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        } />
+        <Route path="/add-product" element={
+          <ProtectedRoute>
+            <AddProduct />
+          </ProtectedRoute>
+        } />
+        <Route path="/your-listings" element={
+          <ProtectedRoute>
+            <YourListings />
+          </ProtectedRoute>
+        } /> 
+        <Route path="/pending-orders" element={
+          <ProtectedRoute>
+            <PendingOrders />
+          </ProtectedRoute>
+        } />
+        <Route path="/history" element={
+          <ProtectedRoute>
+            <History />
+          </ProtectedRoute>
+        } />
+        <Route path="/orders" element={
+          <ProtectedRoute>
+            <Orders />
+          </ProtectedRoute>
+        } />
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
   );

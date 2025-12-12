@@ -60,13 +60,28 @@ function OrdersFilterBar({ onFilterChange, showDateSold = true }) {
           onClick={() => setShowPanel((s) => !s)}
           style={{
             padding: "12px 18px",
-            background: "linear-gradient(135deg, #0d6efd, #5aa9ff)",
+            background: "linear-gradient(135deg, #1a5d3a 0%, #0d3b2a 100%)",
             color: "#fff",
             fontWeight: 600,
-            boxShadow: "0 8px 18px rgba(13,110,253,0.18)",
+            borderRadius: "10px",
+            border: "none",
+            cursor: "pointer",
+            boxShadow: "0 4px 12px rgba(26, 93, 58, 0.25)",
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "8px",
+            transition: "all 0.3s ease",
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.transform = "translateY(-2px)";
+            e.target.style.boxShadow = "0 8px 20px rgba(26, 93, 58, 0.35)";
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.transform = "translateY(0)";
+            e.target.style.boxShadow = "0 4px 12px rgba(26, 93, 58, 0.25)";
           }}
         >
-          Filter options
+          <i className="fas fa-filter"></i> Filter options
         </button>
       </div>
 
@@ -94,14 +109,15 @@ function OrdersFilterBar({ onFilterChange, showDateSold = true }) {
                   alignItems: "center",
                   gap: "8px",
                   background: activeFields.has(field.key)
-                    ? "rgba(13,110,253,0.12)"
+                    ? "rgba(26, 93, 58, 0.12)"
                     : "#f4f6fb",
                   padding: "8px 12px",
-                  borderRadius: "12px",
+                  borderRadius: "10px",
                   cursor: "pointer",
                   border: activeFields.has(field.key)
-                    ? "1px solid #0d6efd"
+                    ? "2px solid #1a5d3a"
                     : "1px solid #e5e7eb",
+                  transition: "all 0.3s ease",
                 }}
               >
                 <input

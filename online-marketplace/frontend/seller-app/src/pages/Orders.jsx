@@ -1,7 +1,7 @@
 import Sidebar from "../components/Sidebar";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import BackButton from "../components/BackButton";
+import "./PageStyles.css";
 
 function Orders() {
   const navigate = useNavigate();
@@ -51,127 +51,98 @@ function Orders() {
   const recentHistory = soldOrders.slice(0, 2);
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
+    <div className="seller-app">
       <Sidebar />
-
-      <div style={{ flex: 1, padding: "20px", background: "#f7f7f7" }}>
-        <BackButton />
-        <h1>Orders Overview</h1>
-
-        {/* ------------------ PENDING ORDERS PREVIEW ------------------ */}
-        <div
-          style={{
-            marginTop: "30px",
-            background: "#fff",
-            borderRadius: "20px",
-            padding: "20px",
-            boxShadow: "0 14px 26px rgba(17, 24, 39, 0.1)",
-            border: "1px solid #e5e7eb",
-          }}
-        >
-          <h2>Pending Orders</h2>
-          <p>Your most recent pending orders.</p>
-
-          {recentPending.length === 0 && <p>No pending orders.</p>}
-
-          <div style={{ marginTop: "20px", display: "flex", gap: "20px", flexWrap: "wrap" }}>
-            {recentPending.map((order) => (
-              <div
-                key={order.id}
-                style={{
-                  width: "220px",
-                  background: "#fff",
-                  borderRadius: "16px",
-                  padding: "10px",
-                  boxShadow: "0 10px 18px rgba(17, 24, 39, 0.08)",
-                  textAlign: "center",
-                }}
-              >
-                <img
-                  src={order.image}
-                  alt={order.product}
-                  style={{ width: "100%", height: "130px", objectFit: "cover", borderRadius: "6px" }}
-                />
-                <h3 style={{ marginTop: "10px" }}>{order.product}</h3>
-                <p>Quantity: {order.quantity}</p>
-                <p>Buyer: {order.buyer}</p>
-              </div>
-            ))}
-          </div>
-
-          <button
-            onClick={() => navigate("/pending-orders")}
-            style={{
-              marginTop: "20px",
-              padding: "10px 18px",
-              border: "none",
-              borderRadius: "14px",
-              background: "#007bff",
-              color: "#fff",
-              cursor: "pointer",
-            }}
-          >
-            View More
-          </button>
+      <div className="page-container">
+        <div className="page-header">
+          <h1 className="page-title">
+            <i className="fas fa-shopping-cart"></i> Orders Overview
+          </h1>
+          <p className="page-subtitle">Manage your pending orders and view sales history</p>
         </div>
 
-        {/* ------------------ SALES HISTORY PREVIEW ------------------ */}
-        <div
-          style={{
-            marginTop: "40px",
-            background: "#fff",
-            borderRadius: "20px",
-            padding: "20px",
-            boxShadow: "0 14px 26px rgba(17, 24, 39, 0.1)",
-            border: "1px solid #e5e7eb",
-          }}
-        >
-          <h2>Sales History</h2>
-          <p>Your latest completed orders.</p>
+        {/* PENDING ORDERS PREVIEW */}
+        <div className="content-card">
+          <h2 className="section-title">
+            <i className="fas fa-clock"></i> Pending Orders
+          </h2>
+          <p style={{ color: "#666", marginBottom: "20px" }}>Your most recent pending orders</p>
 
-          {recentHistory.length === 0 && <p>No sales history yet.</p>}
-
-          <div style={{ marginTop: "20px", display: "flex", gap: "20px", flexWrap: "wrap" }}>
-            {recentHistory.map((order) => (
-              <div
-                key={order.id}
-                style={{
-                  width: "220px",
-                  background: "#fff",
-                  borderRadius: "16px",
-                  padding: "10px",
-                  boxShadow: "0 10px 18px rgba(17, 24, 39, 0.08)",
-                  textAlign: "center",
-                }}
-              >
-                <img
-                  src={order.image}
-                  alt={order.product}
-                  style={{ width: "100%", height: "130px", objectFit: "cover", borderRadius: "6px" }}
-                />
-                <h3 style={{ marginTop: "10px" }}>{order.product}</h3>
-                <p>Quantity: {order.quantity}</p>
-                <p>Price: ${order.price.toFixed(2)}</p>
-                <p>Total: ${(order.price * order.quantity).toFixed(2)}</p>
-                <p>Date Sold: {order.date}</p>
+          {recentPending.length === 0 ? (
+            <div className="empty-state">
+              <i className="fas fa-inbox"></i>
+              <p>No pending orders at the moment.</p>
+            </div>
+          ) : (
+            <>
+              <div className="product-grid">
+                {recentPending.map((order) => (
+                  <div key={order.id} className="product-card">
+                    <img
+                      src={order.image}
+                      alt={order.product}
+                      className="product-image"
+                    />
+                    <div className="product-info">
+                      <h3 className="product-name">{order.product}</h3>
+                      <p className="product-stock">Quantity: {order.quantity}</p>
+                      <p className="product-stock">Buyer: {order.buyer}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+              <button
+                onClick={() => navigate("/pending-orders")}
+                className="btn-primary"
+                style={{ marginTop: "20px" }}
+              >
+                <i className="fas fa-arrow-right"></i> View More
+              </button>
+            </>
+          )}
+        </div>
 
-          <button
-            onClick={() => navigate("/history")}
-            style={{
-              marginTop: "20px",
-              padding: "10px 18px",
-              border: "none",
-              borderRadius: "14px",
-              background: "#28a745",
-              color: "#fff",
-              cursor: "pointer",
-            }}
-          >
-            View More
-          </button>
+        {/* SALES HISTORY PREVIEW */}
+        <div className="content-card">
+          <h2 className="section-title">
+            <i className="fas fa-history"></i> Sales History
+          </h2>
+          <p style={{ color: "#666", marginBottom: "20px" }}>Your latest completed orders</p>
+
+          {recentHistory.length === 0 ? (
+            <div className="empty-state">
+              <i className="fas fa-inbox"></i>
+              <p>No sales history yet.</p>
+            </div>
+          ) : (
+            <>
+              <div className="product-grid">
+                {recentHistory.map((order) => (
+                  <div key={order.id} className="product-card">
+                    <img
+                      src={order.image}
+                      alt={order.product}
+                      className="product-image"
+                    />
+                    <div className="product-info">
+                      <h3 className="product-name">{order.product}</h3>
+                      <p className="product-stock">Quantity: {order.quantity}</p>
+                      <p className="product-price">${order.price.toFixed(2)}</p>
+                      <p className="product-stock">Total: ${(order.price * order.quantity).toFixed(2)}</p>
+                      <p className="product-stock" style={{ fontSize: "12px" }}>Date: {order.date}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <button
+                onClick={() => navigate("/history")}
+                className="btn-primary"
+                style={{ marginTop: "20px", background: "linear-gradient(135deg, #1a5d3a 0%, #0d3b2a 100%)" }}
+              >
+                <i className="fas fa-arrow-right"></i> View More
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 import Sidebar from "../components/Sidebar";
 import { useState } from "react";
 import categories from "../utils/categories";
-import BackButton from "../components/BackButton";
+import "./PageStyles.css";
 
 function AddProduct() {
   const [category, setCategory] = useState("");
@@ -45,58 +45,59 @@ function AddProduct() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
+    <div className="seller-app">
       <Sidebar />
-      <div style={{ flex: 1, padding: "20px" }}>
-        <BackButton />
-        <h1>Add Product</h1>
+      <div className="page-container">
+        <div className="page-header">
+          <h1 className="page-title">
+            <i className="fas fa-plus-circle"></i> Add Product
+          </h1>
+          <p className="page-subtitle">Select a category and add your products to start selling</p>
+        </div>
 
         {/* Category Buttons */}
-        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "20px" }}>
-          {categories.map((c) => (
-            <button
-              key={c.name}
-              onClick={() => setCategory(c.name)}
-              style={{
-                padding: "10px 15px",
-                border: category === c.name ? "2px solid #007bff" : "1px solid #ccc",
-                background: category === c.name ? "#e0f0ff" : "#fff",
-                borderRadius: "14px",
-                cursor: "pointer",
-                boxShadow: category === c.name ? "0 8px 16px rgba(13,110,253,0.12)" : "0 4px 10px rgba(0,0,0,0.04)"
-              }}
-            >
-              {c.name}
-            </button>
-          ))}
+        <div className="content-card">
+          <h2 className="section-title">
+            <i className="fas fa-tags"></i> Select Category
+          </h2>
+          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "20px" }}>
+            {categories.map((c) => (
+              <button
+                key={c.name}
+                onClick={() => setCategory(c.name)}
+                className={category === c.name ? "btn-primary" : "btn-secondary"}
+                style={{
+                  border: category === c.name ? "none" : "2px solid #e0e0e0",
+                  background: category === c.name ? undefined : "#fff"
+                }}
+              >
+                {c.name}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Subcategory Boxes */}
         {category && (
-          <div style={{ marginTop: "30px" }}>
-            <h2>{category}</h2>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "20px", marginTop: "10px" }}>
+          <div className="content-card">
+            <h2 className="section-title">
+              <i className="fas fa-folder"></i> {category}
+            </h2>
+            <div className="product-grid">
               {subcategoriesList.map((sub) => (
                 <div
                   key={sub.name}
                   onClick={() => openForm(sub)}
-                  style={{
-                    width: "180px",
-                    textAlign: "center",
-                    border: "1px solid #ccc",
-                    borderRadius: "16px",
-                    padding: "10px",
-                    cursor: "pointer",
-                    boxShadow: "0 10px 18px rgba(17, 24, 39, 0.08)",
-                    background: "#fff"
-                  }}
+                  className="product-card"
                 >
                   <img
                     src={sub.image}
                     alt={sub.name}
-                    style={{ width: "100%", height: "120px", objectFit: "cover", marginBottom: "5px" }}
+                    className="product-image"
                   />
-                  <p>{sub.name}</p>
+                  <div className="product-info">
+                    <p className="product-name">{sub.name}</p>
+                  </div>
                 </div>
               ))}
             </div>
@@ -105,103 +106,88 @@ function AddProduct() {
 
         {/* Modal Form */}
         {activeSubcategory && (
-          <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              background: "rgba(0,0,0,0.5)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              zIndex: 1000,
-            }}
-          >
-            <form
-              onSubmit={handleSubmit}
-              style={{
-                background: "#fff",
-                padding: "20px",
-                borderRadius: "18px",
-                width: "400px",
-                display: "flex",
-                flexDirection: "column",
-                gap: "10px",
-                boxShadow: "0 16px 32px rgba(17, 24, 39, 0.14)"
-              }}
-            >
-              <h2>Add Product to {activeSubcategory.name}</h2>
-              <input
-                type="text"
-                placeholder="Product Name"
-                value={productName}
-                onChange={(e) => setProductName(e.target.value)}
-                required
-              />
-              <input
-                type="number"
-                placeholder="Price"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                required
-              />
-              <input
-                type="number"
-                placeholder="Available Stock"
-                value={stock}
-                onChange={(e) => setStock(e.target.value)}
-                required
-              />
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => setImage(e.target.files[0])}
-              />
-              <div style={{ display: "flex", justifyContent: "space-between", marginTop: "10px" }}>
-                <button type="submit" style={{ padding: "10px", background: "#007bff", color: "#fff", border: "none", borderRadius: "12px" }}>
-                  Add Product
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveSubcategory(null)}
-                  style={{ padding: "10px", background: "#ccc", color: "#000", border: "none", borderRadius: "12px" }}
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
+          <div className="modal-overlay" onClick={() => setActiveSubcategory(null)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <h2 style={{ marginBottom: "20px", color: "#1a5d3a" }}>
+                Add Product to {activeSubcategory.name}
+              </h2>
+              <form onSubmit={handleSubmit}>
+                <div className="form-group">
+                  <label>Product Name</label>
+                  <input
+                    type="text"
+                    placeholder="Enter product name"
+                    value={productName}
+                    onChange={(e) => setProductName(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Price</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    placeholder="Enter price"
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Available Stock</label>
+                  <input
+                    type="number"
+                    placeholder="Enter stock quantity"
+                    value={stock}
+                    onChange={(e) => setStock(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Product Image</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setImage(e.target.files[0])}
+                  />
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", marginTop: "20px", gap: "10px" }}>
+                  <button type="submit" className="btn-primary">
+                    <i className="fas fa-check"></i> Add Product
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveSubcategory(null)}
+                    className="btn-secondary"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         )}
 
         {/* Added Products */}
         {addedProducts.length > 0 && (
-          <div style={{ marginTop: "30px" }}>
-            <h2>Products Added</h2>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
+          <div className="content-card">
+            <h2 className="section-title">
+              <i className="fas fa-check-circle"></i> Products Added
+            </h2>
+            <div className="product-grid">
               {addedProducts.map((p) => (
-                <div
-                  key={p.id}
-                  style={{
-                    width: "150px",
-                    border: "1px solid #ccc",
-                    borderRadius: "16px",
-                    textAlign: "center",
-                    padding: "10px",
-                    boxShadow: "0 10px 18px rgba(17, 24, 39, 0.08)",
-                    background: "#fff"
-                  }}
-                >
+                <div key={p.id} className="product-card">
                   <img
                     src={p.image}
                     alt={p.name}
-                    style={{ width: "100%", height: "100px", objectFit: "cover", marginBottom: "5px" }}
+                    className="product-image"
                   />
-                  <p>{p.category}</p>
-                  <p><strong>{p.subcategory}</strong></p>
-                  <p>${p.price}</p>
-                  <p>Stock: {p.stock}</p>
+                  <div className="product-info">
+                    <p style={{ fontSize: "12px", color: "#666", margin: "5px 0" }}>{p.category}</p>
+                    <p className="product-name">{p.subcategory}</p>
+                    <p className="product-price">${p.price}</p>
+                    <p className="product-stock">Stock: {p.stock}</p>
+                  </div>
                 </div>
               ))}
             </div>

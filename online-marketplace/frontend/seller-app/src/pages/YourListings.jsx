@@ -1,6 +1,6 @@
 import Sidebar from "../components/Sidebar";
 import { useState } from "react";
-import BackButton from "../components/BackButton";
+import "./PageStyles.css";
 
 function YourListings() {
   // Temporary sample items — now including price
@@ -11,37 +11,40 @@ function YourListings() {
   ]);
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
+    <div className="seller-app">
       <Sidebar />
+      <div className="page-container">
+        <div className="page-header">
+          <h1 className="page-title">
+            <i className="fas fa-box"></i> Your Listings
+          </h1>
+          <p className="page-subtitle">These are all the products you currently have listed for sale</p>
+        </div>
 
-      <div style={{ flex: 1, padding: "20px", background: "#f7f7f7" }}>
-        <BackButton />
-        <h1>Your Listings</h1>
-        <p>These are all the products you currently have listed for sale.</p>
-
-        <div style={{ marginTop: "20px", display: "flex", flexWrap: "wrap", gap: "20px" }}>
-          {products.map(product => (
-            <div
-              key={product.id}
-              style={{
-                width: "200px",
-                background: "#fff",
-                borderRadius: "18px",
-                padding: "12px",
-                boxShadow: "0 12px 22px rgba(17, 24, 39, 0.08)",
-                textAlign: "center"
-              }}
-            >
-              <img
-                src={product.image}
-                alt={product.name}
-                style={{ width: "100%", height: "130px", objectFit: "cover", borderRadius: "6px" }}
-              />
-              <h3 style={{ marginTop: "10px" }}>{product.name}</h3>
-              <p style={{ fontSize: "14px" }}>Price: ${product.price.toFixed(2)}</p>
-              <p style={{ fontSize: "14px" }}>Available: {product.stock}</p>
+        <div className="content-card">
+          {products.length === 0 ? (
+            <div className="empty-state">
+              <i className="fas fa-inbox"></i>
+              <p>No products listed yet. <a href="/add-product">Add your first product</a></p>
             </div>
-          ))}
+          ) : (
+            <div className="product-grid">
+              {products.map(product => (
+                <div key={product.id} className="product-card">
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="product-image"
+                  />
+                  <div className="product-info">
+                    <h3 className="product-name">{product.name}</h3>
+                    <p className="product-price">${product.price.toFixed(2)}</p>
+                    <p className="product-stock">Available: {product.stock}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -1,15 +1,19 @@
 import Sidebar from "../components/Sidebar";
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import BackButton from "../components/BackButton";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import "./Dashboard.css";
 
 function Dashboard() {
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
   // Temporary frontend values — dynamic later with backend
   const [stats] = useState({
     totalProducts: 12,
     pendingOrders: 5,
     salesCompleted: 48,
-    revenue: 2350, // You can remove if not needed
+    revenue: 2350,
   });
 
   const [recentSales] = useState([
@@ -19,89 +23,124 @@ function Dashboard() {
     { id: 4, product: "Gaming Headset", buyer: "Mona Adel", amount: 80 },
   ]);
 
+  useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem('user') || '{}');
+    if (userData.isAuthenticated && userData.type === 'seller') {
+      setUser(userData);
+    } else {
+      navigate('/login');
+    }
+    setIsLoading(false);
+  }, [navigate]);
+
+  if (isLoading) {
+    return (
+      <div className="loading-spinner">
+        <i className="fas fa-spinner fa-spin"></i>
+        <p>Loading Dashboard...</p>
+      </div>
+    );
+  }
+
+  const statCards = [
+    { label: "Total Listings", value: stats.totalProducts, icon: "fa-box", color: "#1a5d3a" },
+    { label: "Pending Orders", value: stats.pendingOrders, icon: "fa-clock", color: "#ffcc00" },
+    { label: "Sales Completed", value: stats.salesCompleted, icon: "fa-check-circle", color: "#1a5d3a" },
+    { label: "Revenue", value: "$" + stats.revenue.toLocaleString(), icon: "fa-dollar-sign", color: "#ffcc00" }
+  ];
+
   return (
-    <div style={{ display: "flex", background: "#f5f7fa", minHeight: "100vh" }}>
+    <div className="seller-app">
       <Sidebar />
+      <div className="dashboard-content">
+        {/* Top Banner */}
+        <div className="dashboard-banner">
+          <div className="banner-content">
+            <h1 className="banner-title">
+              Welcome back, <span>{user?.name || 'Seller'}</span>!
+            </h1>
+            <p className="banner-subtitle">Manage your store and track your sales performance</p>
+          </div>
+        </div>
 
-      <div style={{ padding: "30px", flex: 1 }}>
-        <BackButton />
-        <h1>Dashboard</h1>
-        <p>Overview of your store performance.</p>
+        <div className="dashboard-container">
+          {/* Stats Cards */}
+          <div className="stats-grid">
+            {statCards.map((card, index) => (
+              <div key={index} className="stat-card" style={{ animationDelay: `${index * 0.1}s` }}>
+                <div className="stat-icon" style={{ background: `${card.color}20`, color: card.color }}>
+                  <i className={`fas ${card.icon}`}></i>
+                </div>
+                <div className="stat-info">
+                  <h2 className="stat-value">{card.value}</h2>
+                  <p className="stat-label">{card.label}</p>
+                </div>
+              </div>
+            ))}
+          </div>
 
-        {/* --- Stats Cards --- */}
-        <div style={{ display: "flex", gap: "20px", marginTop: "20px", flexWrap: "wrap" }}>
-          {[
-            { label: "Total Listings", value: stats.totalProducts },
-            { label: "Pending Orders", value: stats.pendingOrders },
-            { label: "Sales Completed", value: stats.salesCompleted },
-            { label: "Revenue", value: "$" + stats.revenue.toLocaleString() }
-          ].map((card, index) => (
-            <div key={index}
-              style={{
-                background: "#fff",
-                padding: "25px",
-                borderRadius: "18px",
-                width: "220px",
-                textAlign: "center",
-                boxShadow: "0 10px 22px rgba(17, 24, 39, 0.08)",
-              }}
-            >
-              <h2 style={{ marginBottom: "10px", color: "#007bff" }}>{card.value}</h2>
-              <p style={{ fontWeight: "bold" }}>{card.label}</p>
+          {/* Quick Actions */}
+          <section className="quick-actions-section">
+            <h2 className="section-title">
+              <i className="fas fa-bolt"></i> Quick Actions
+            </h2>
+            <div className="quick-actions">
+              <Link to="/add-product" className="action-btn">
+                <i className="fas fa-plus-circle"></i>
+                <span>Add Product</span>
+              </Link>
+              <Link to="/your-listings" className="action-btn">
+                <i className="fas fa-box"></i>
+                <span>Your Listings</span>
+              </Link>
+              <Link to="/pending-orders" className="action-btn">
+                <i className="fas fa-clock"></i>
+                <span>Pending Orders</span>
+              </Link>
+              <Link to="/history" className="action-btn">
+                <i className="fas fa-history"></i>
+                <span>Sales History</span>
+              </Link>
             </div>
-          ))}
-        </div>
+          </section>
 
-        {/* --- Quick Action Buttons --- */}
-        <h2 style={{ marginTop: "40px" }}>Quick Actions</h2>
-        <div style={{ display: "flex", gap: "20px", marginTop: "15px", flexWrap: "wrap" }}>
-          <Link to="/add-product" style={buttonStyle}>➕ Add Product</Link>
-          <Link to="/your-listings" style={buttonStyle}>📦 Your Listings</Link>
-          <Link to="/pending-orders" style={buttonStyle}>🕒 Pending Orders</Link>
-          <Link to="/history" style={buttonStyle}>📜 Sales History</Link>
-        </div>
-
-        {/* --- Recent Sales Section --- */}
-        <h2 style={{ marginTop: "50px" }}>Recent Sales</h2>
-        <div style={{ background: "#fff", marginTop: "10px", padding: "20px", borderRadius: "18px", boxShadow: "0 12px 24px rgba(17, 24, 39, 0.08)" }}>
-          {recentSales.length === 0 ? (
-            <p>No recent sales.</p>
-          ) : (
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
-              <thead>
-                <tr style={{ textAlign: "left", borderBottom: "2px solid #e1e1e1" }}>
-                  <th>Product</th>
-                  <th>Buyer</th>
-                  <th>Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentSales.map((sale) => (
-                  <tr key={sale.id} style={{ borderBottom: "1px solid #eee" }}>
-                    <td>{sale.product}</td>
-                    <td>{sale.buyer}</td>
-                    <td>${sale.amount}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
+          {/* Recent Sales */}
+          <section className="recent-sales-section">
+            <h2 className="section-title">
+              <i className="fas fa-chart-line"></i> Recent Sales
+            </h2>
+            <div className="sales-table-container">
+              {recentSales.length === 0 ? (
+                <div className="empty-state">
+                  <i className="fas fa-inbox"></i>
+                  <p>No recent sales.</p>
+                </div>
+              ) : (
+                <table className="sales-table">
+                  <thead>
+                    <tr>
+                      <th>Product</th>
+                      <th>Buyer</th>
+                      <th>Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {recentSales.map((sale) => (
+                      <tr key={sale.id}>
+                        <td>{sale.product}</td>
+                        <td>{sale.buyer}</td>
+                        <td className="amount-cell">${sale.amount}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </section>
         </div>
       </div>
     </div>
   );
 }
-
-// Shared button style
-const buttonStyle = {
-  background: "#007bff",
-  padding: "12px 18px",
-  borderRadius: "14px",
-  color: "white",
-  fontWeight: "bold",
-  textDecoration: "none",
-  display: "inline-block",
-  boxShadow: "0 8px 18px rgba(13,110,253,0.18)"
-};
 
 export default Dashboard;

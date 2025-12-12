@@ -1,8 +1,10 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import "./Sidebar.css";
 
 function Sidebar() {
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Dropdown open/close
   const [openOrders, setOpenOrders] = useState(false);
@@ -18,108 +20,107 @@ function Sidebar() {
     if (insideOrders) setOpenOrders(true);
   }, [insideOrders]);
 
-  const linkStyle = (path, isSub = false) => ({
-    display: "block",
-    padding: isSub ? "8px 15px" : "10px 15px",
-    color: location.pathname === path ? "#fff" : "#ecf0f1",
-    background: location.pathname === path ? "#007bff" : "transparent",
-    textDecoration: "none",
-    borderRadius: "5px",
-    marginBottom: isSub ? "6px" : "10px",
-  });
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    navigate('/login');
+  };
+
+  // Get user info
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   return (
-    <div
-      style={{
-        width: "220px",
-        background: "#2c3e50",
-        color: "#ecf0f1",
-        padding: "20px",
-        minHeight: "100vh",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      <h2 style={{ marginBottom: "30px" }}>Seller Menu</h2>
+    <div className="sidebar">
+      <div className="sidebar-header">
+        <h2 className="sidebar-logo">
+          <i className="fas fa-store"></i> Seller Hub
+        </h2>
+        {user.name && (
+          <div className="sidebar-user">
+            <i className="fas fa-user-circle"></i>
+            <span>{user.name}</span>
+          </div>
+        )}
+      </div>
 
-      <ul style={{ listStyle: "none", padding: 0 }}>
-
+      <ul className="sidebar-menu">
         <li>
-          <Link to="/" style={linkStyle("/")}>Dashboard</Link>
-        </li>
-
-        <li>
-          <Link to="/add-product" style={linkStyle("/add-product")}>Add Product</Link>
-        </li>
-
-        <li>
-          <Link to="/your-listings" style={linkStyle("/your-listings")}>
-            Your Listings
+          <Link 
+            to="/" 
+            className={`sidebar-link ${location.pathname === "/" ? "active" : ""}`}
+          >
+            <i className="fas fa-chart-line"></i> Dashboard
           </Link>
         </li>
 
-        {/* ---------------- ORDERS DROPDOWN WITH ARROW ---------------- */}
-        <li style={{ position: "relative" }}>
-
-          {/* Orders main row */}
-          <div
-            style={{
-              ...linkStyle("/orders"),
-              background: insideOrders ? "#007bff" : "transparent",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              cursor: "pointer",
-            }}
+        <li>
+          <Link 
+            to="/add-product" 
+            className={`sidebar-link ${location.pathname === "/add-product" ? "active" : ""}`}
           >
-            {/* Clicking text navigates to Orders */}
+            <i className="fas fa-plus-circle"></i> Add Product
+          </Link>
+        </li>
+
+        <li>
+          <Link 
+            to="/your-listings" 
+            className={`sidebar-link ${location.pathname === "/your-listings" ? "active" : ""}`}
+          >
+            <i className="fas fa-box"></i> Your Listings
+          </Link>
+        </li>
+
+        {/* ORDERS DROPDOWN */}
+        <li className="sidebar-dropdown">
+          <div
+            className={`sidebar-link ${insideOrders ? "active" : ""}`}
+            style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}
+          >
             <Link
               to="/orders"
-              style={{ color: "#fff", textDecoration: "none", flex: 1 }}
+              style={{ color: "inherit", textDecoration: "none", flex: 1, display: "flex", alignItems: "center", gap: "10px" }}
             >
-              Orders
+              <i className="fas fa-shopping-cart"></i> Orders
             </Link>
-
-            {/* Arrow button */}
             <span
               onClick={(e) => {
-                e.stopPropagation(); // Prevent navigating to /orders
+                e.stopPropagation();
                 setOpenOrders(!openOrders);
               }}
-              style={{
-                cursor: "pointer",
-                padding: "0 6px",
-                userSelect: "none",
-              }}
+              className="dropdown-arrow"
             >
-              {openOrders ? "▼" : "▶"}
+              {openOrders ? <i className="fas fa-chevron-down"></i> : <i className="fas fa-chevron-right"></i>}
             </span>
           </div>
 
-          {/* Dropdown */}
           {openOrders && (
-            <ul style={{ listStyle: "none", paddingLeft: "20px", marginTop: "10px" }}>
+            <ul className="sidebar-submenu">
               <li>
                 <Link
                   to="/pending-orders"
-                  style={linkStyle("/pending-orders", true)}
+                  className={`sidebar-link sub ${location.pathname === "/pending-orders" ? "active" : ""}`}
                 >
-                  Pending Orders
+                  <i className="fas fa-clock"></i> Pending Orders
                 </Link>
               </li>
-
               <li>
                 <Link
                   to="/history"
-                  style={linkStyle("/history", true)}
+                  className={`sidebar-link sub ${location.pathname === "/history" ? "active" : ""}`}
                 >
-                  History
+                  <i className="fas fa-history"></i> History
                 </Link>
               </li>
             </ul>
           )}
         </li>
       </ul>
+
+      <div className="sidebar-footer">
+        <button onClick={handleLogout} className="logout-btn">
+          <i className="fas fa-sign-out-alt"></i> Logout
+        </button>
+      </div>
     </div>
   );
 }
