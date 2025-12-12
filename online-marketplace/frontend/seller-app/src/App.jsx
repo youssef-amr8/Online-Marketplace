@@ -4,6 +4,7 @@ import AddProduct from "./pages/AddProduct";
 import YourListings from "./pages/YourListings";
 import PendingOrders from "./pages/PendingOrders";
 import History from "./pages/History";
+import Orders from "./pages/Orders";
 
 function App() {
   return (
@@ -12,6 +13,9 @@ function App() {
         <Route path="/" element={<Dashboard />} />
         <Route path="/add-product" element={<AddProduct />} />
         <Route path="/your-listings" element={<YourListings />} /> 
+        <Route path="/pending-orders" element={<PendingOrders />} />
+        <Route path="/history" element={<History />} />
+        <Route path="/orders" element={<Orders />} />
         <Route path="/pending-orders" element={<PendingOrders />} />
         <Route path="/history" element={<History />} />
 

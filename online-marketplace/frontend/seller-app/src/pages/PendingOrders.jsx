@@ -1,5 +1,6 @@
 import Sidebar from "../components/Sidebar";
 import { useState } from "react";
+import BackButton from "../components/BackButton";
 
 function PendingOrders() {
   // Sample pending orders
@@ -38,6 +39,7 @@ function PendingOrders() {
       <Sidebar />
 
       <div style={{ flex: 1, padding: "20px", background: "#f7f7f7" }}>
+        <BackButton />
         <h1>Pending Orders</h1>
         <p>These are all the orders that have been placed but not delivered yet.</p>
 
@@ -50,9 +52,9 @@ function PendingOrders() {
               style={{
                 width: "220px",
                 background: "#fff",
-                borderRadius: "10px",
-                padding: "10px",
-                boxShadow: "0 0 5px rgba(0,0,0,0.1)",
+                borderRadius: "18px",
+                padding: "12px",
+                boxShadow: "0 12px 22px rgba(17, 24, 39, 0.08)",
                 textAlign: "center",
               }}
             >
@@ -68,8 +70,8 @@ function PendingOrders() {
                 onClick={() => cancelOrder(order.id)}
                 style={{
                   marginTop: "10px",
-                  padding: "6px 12px",
-                  borderRadius: "5px",
+                  padding: "8px 14px",
+                  borderRadius: "12px",
                   border: "none",
                   background: "#dc3545",
                   color: "#fff",

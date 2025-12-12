@@ -1,6 +1,7 @@
 import Sidebar from "../components/Sidebar";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import BackButton from "../components/BackButton";
 
 function Dashboard() {
   // Temporary frontend values — dynamic later with backend
@@ -23,6 +24,7 @@ function Dashboard() {
       <Sidebar />
 
       <div style={{ padding: "30px", flex: 1 }}>
+        <BackButton />
         <h1>Dashboard</h1>
         <p>Overview of your store performance.</p>
 
@@ -38,10 +40,10 @@ function Dashboard() {
               style={{
                 background: "#fff",
                 padding: "25px",
-                borderRadius: "10px",
+                borderRadius: "18px",
                 width: "220px",
                 textAlign: "center",
-                boxShadow: "0 0 6px rgba(0,0,0,0.08)",
+                boxShadow: "0 10px 22px rgba(17, 24, 39, 0.08)",
               }}
             >
               <h2 style={{ marginBottom: "10px", color: "#007bff" }}>{card.value}</h2>
@@ -61,7 +63,7 @@ function Dashboard() {
 
         {/* --- Recent Sales Section --- */}
         <h2 style={{ marginTop: "50px" }}>Recent Sales</h2>
-        <div style={{ background: "#fff", marginTop: "10px", padding: "20px", borderRadius: "10px", boxShadow: "0 0 6px rgba(0,0,0,0.08)" }}>
+        <div style={{ background: "#fff", marginTop: "10px", padding: "20px", borderRadius: "18px", boxShadow: "0 12px 24px rgba(17, 24, 39, 0.08)" }}>
           {recentSales.length === 0 ? (
             <p>No recent sales.</p>
           ) : (
@@ -94,11 +96,12 @@ function Dashboard() {
 const buttonStyle = {
   background: "#007bff",
   padding: "12px 18px",
-  borderRadius: "8px",
+  borderRadius: "14px",
   color: "white",
   fontWeight: "bold",
   textDecoration: "none",
-  display: "inline-block"
+  display: "inline-block",
+  boxShadow: "0 8px 18px rgba(13,110,253,0.18)"
 };
 
 export default Dashboard;

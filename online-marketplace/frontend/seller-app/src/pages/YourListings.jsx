@@ -1,5 +1,6 @@
 import Sidebar from "../components/Sidebar";
 import { useState } from "react";
+import BackButton from "../components/BackButton";
 
 function YourListings() {
   // Temporary sample items — now including price
@@ -14,6 +15,7 @@ function YourListings() {
       <Sidebar />
 
       <div style={{ flex: 1, padding: "20px", background: "#f7f7f7" }}>
+        <BackButton />
         <h1>Your Listings</h1>
         <p>These are all the products you currently have listed for sale.</p>
 
@@ -24,9 +26,9 @@ function YourListings() {
               style={{
                 width: "200px",
                 background: "#fff",
-                borderRadius: "10px",
-                padding: "10px",
-                boxShadow: "0 0 5px rgba(0,0,0,0.1)",
+                borderRadius: "18px",
+                padding: "12px",
+                boxShadow: "0 12px 22px rgba(17, 24, 39, 0.08)",
                 textAlign: "center"
               }}
             >

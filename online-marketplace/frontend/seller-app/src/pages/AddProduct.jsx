@@ -1,6 +1,7 @@
 import Sidebar from "../components/Sidebar";
 import { useState } from "react";
 import categories from "../utils/categories";
+import BackButton from "../components/BackButton";
 
 function AddProduct() {
   const [category, setCategory] = useState("");
@@ -47,6 +48,7 @@ function AddProduct() {
     <div style={{ display: "flex", minHeight: "100vh" }}>
       <Sidebar />
       <div style={{ flex: 1, padding: "20px" }}>
+        <BackButton />
         <h1>Add Product</h1>
 
         {/* Category Buttons */}
@@ -59,8 +61,9 @@ function AddProduct() {
                 padding: "10px 15px",
                 border: category === c.name ? "2px solid #007bff" : "1px solid #ccc",
                 background: category === c.name ? "#e0f0ff" : "#fff",
-                borderRadius: "5px",
+                borderRadius: "14px",
                 cursor: "pointer",
+                boxShadow: category === c.name ? "0 8px 16px rgba(13,110,253,0.12)" : "0 4px 10px rgba(0,0,0,0.04)"
               }}
             >
               {c.name}
@@ -81,9 +84,11 @@ function AddProduct() {
                     width: "180px",
                     textAlign: "center",
                     border: "1px solid #ccc",
-                    borderRadius: "5px",
+                    borderRadius: "16px",
                     padding: "10px",
                     cursor: "pointer",
+                    boxShadow: "0 10px 18px rgba(17, 24, 39, 0.08)",
+                    background: "#fff"
                   }}
                 >
                   <img
@@ -119,11 +124,12 @@ function AddProduct() {
               style={{
                 background: "#fff",
                 padding: "20px",
-                borderRadius: "8px",
+                borderRadius: "18px",
                 width: "400px",
                 display: "flex",
                 flexDirection: "column",
                 gap: "10px",
+                boxShadow: "0 16px 32px rgba(17, 24, 39, 0.14)"
               }}
             >
               <h2>Add Product to {activeSubcategory.name}</h2>
@@ -154,13 +160,13 @@ function AddProduct() {
                 onChange={(e) => setImage(e.target.files[0])}
               />
               <div style={{ display: "flex", justifyContent: "space-between", marginTop: "10px" }}>
-                <button type="submit" style={{ padding: "10px", background: "#007bff", color: "#fff", border: "none", borderRadius: "5px" }}>
+                <button type="submit" style={{ padding: "10px", background: "#007bff", color: "#fff", border: "none", borderRadius: "12px" }}>
                   Add Product
                 </button>
                 <button
                   type="button"
                   onClick={() => setActiveSubcategory(null)}
-                  style={{ padding: "10px", background: "#ccc", color: "#000", border: "none", borderRadius: "5px" }}
+                  style={{ padding: "10px", background: "#ccc", color: "#000", border: "none", borderRadius: "12px" }}
                 >
                   Cancel
                 </button>
@@ -180,9 +186,11 @@ function AddProduct() {
                   style={{
                     width: "150px",
                     border: "1px solid #ccc",
-                    borderRadius: "5px",
+                    borderRadius: "16px",
                     textAlign: "center",
                     padding: "10px",
+                    boxShadow: "0 10px 18px rgba(17, 24, 39, 0.08)",
+                    background: "#fff"
                   }}
                 >
                   <img
