@@ -1,12 +1,13 @@
 // src/pages/CartPage.jsx
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import "./CartPage.css";
 
 const CartPage = () => {
   const { cartItems, removeFromCart, updateQuantity, getCartTotal, clearCart } =
     useCart();
+  const navigate = useNavigate();
 
   const formatPrice = (price) => {
     return price.toLocaleString("en-EG");
@@ -128,7 +129,10 @@ const CartPage = () => {
               </span>
             </div>
 
-            <button className="proceed-checkout-btn">
+            <button
+              className="proceed-checkout-btn"
+              onClick={() => navigate("/checkout")}
+            >
               Proceed to Checkout
             </button>
 

@@ -1,17 +1,18 @@
 // src/components/Header.jsx
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import "./Header.css";
 
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
   const { getCartCount } = useCart();
 
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      console.log("Searching for:", searchQuery);
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
     }
   };
 
@@ -19,7 +20,7 @@ const Header = () => {
     <header className="header">
       <div className="header-container">
         {/* Logo */}
-        <Link to="/" className="header-logo">
+        <Link to="/marketplace" className="header-logo">
           <span className="logo-text">Atlantica</span>
         </Link>
 
@@ -48,7 +49,7 @@ const Header = () => {
         </form>
 
         {/* Home Button */}
-        <Link to="/" className="header-home">
+        <Link to="/marketplace" className="header-home">
           <svg
             className="home-icon"
             xmlns="http://www.w3.org/2000/svg"
@@ -107,7 +108,7 @@ const Header = () => {
           <span className="cart-text">Cart</span>
         </Link>
       </div>
-    </header>
+    </header >
   );
 };
 

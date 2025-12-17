@@ -10,8 +10,15 @@ import ProductDetailPage from "./pages/ProductDetailPage";
 import CartPage from "./pages/CartPage";
 import SettingsPage from "./pages/SettingsPage";
 import OrdersPage from "./pages/OrdersPage";
+import CheckoutPage from "./pages/CheckoutPage";
 import Login from "./pages/Login/Login";
 import MarketPlace from "./pages/MarketPlace/MarketPlace";
+import HelpCenterPage from "./pages/HelpCenterPage";
+import ContactUsPage from "./pages/ContactUsPage";
+import FAQPage from "./pages/FAQPage";
+import ShippingPolicyPage from "./pages/ShippingPolicyPage";
+import ReturnPolicyPage from "./pages/ReturnPolicyPage";
+import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 import "./App.css";
 
 // Create context for navigation toggle
@@ -73,8 +80,24 @@ function AppContent() {
             {/* Cart */}
             <Route path="/cart" element={<CartPage />} />
 
+            {/* Checkout */}
+            <Route path="/checkout" element={<CheckoutPage />} />
+
             {/* Settings */}
             <Route path="/settings" element={<SettingsPage />} />
+
+            {/* Support Pages */}
+            <Route path="/help" element={<HelpCenterPage />} />
+            <Route path="/contact" element={<ContactUsPage />} />
+            <Route path="/faq" element={<FAQPage />} />
+
+            {/* Policy Pages */}
+            <Route path="/shipping-policy" element={<ShippingPolicyPage />} />
+            <Route path="/return-policy" element={<ReturnPolicyPage />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+
+            {/* Search Results */}
+            <Route path="/search" element={<CategoryPage />} />
 
             {/* Orders */}
             <Route path="/orders" element={<OrdersPage />} />

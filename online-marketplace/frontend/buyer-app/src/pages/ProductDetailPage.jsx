@@ -17,7 +17,7 @@ const ProductDetailPage = () => {
   const [showAddedMessage, setShowAddedMessage] = useState(false);
 
   useEffect(() => {
-    
+
     let foundProduct = null;
 
     for (const categoryProducts of Object.values(products)) {
@@ -28,7 +28,7 @@ const ProductDetailPage = () => {
     if (foundProduct) {
       setProduct(foundProduct);
     } else {
-      
+
       navigate("/");
     }
   }, [productId, navigate]);
@@ -103,7 +103,7 @@ const ProductDetailPage = () => {
     );
   }
 
-  
+
   const productImages = [
     product.image,
     product.image,
@@ -139,9 +139,8 @@ const ProductDetailPage = () => {
             {productImages.map((img, index) => (
               <div
                 key={index}
-                className={`thumbnail ${
-                  selectedImage === index ? "active" : ""
-                }`}
+                className={`thumbnail ${selectedImage === index ? "active" : ""
+                  }`}
                 onClick={() => setSelectedImage(index)}
               >
                 <img src={img} alt={`${product.name} ${index + 1}`} />
@@ -290,8 +289,44 @@ const ProductDetailPage = () => {
             </div>
           </div>
         </div>
-      </div>
-    </div>
+
+
+        {/* Reviews Section */}
+        <div className="product-reviews-section">
+          <h2>Customer Reviews</h2>
+          {(() => {
+            const allComments = JSON.parse(localStorage.getItem('product_comments') || '{}');
+            const productComments = allComments[product.id] || [];
+
+            if (productComments.length === 0) {
+              return <p>No reviews yet. Be the first to review this product!</p>;
+            }
+
+            return (
+              <div className="reviews-list">
+                {productComments.map(comment => (
+                  <div key={comment.id} className="review-card">
+                    <div className="review-header">
+                      <div className="review-author-avatar">
+                        {comment.author.charAt(0).toUpperCase()}
+                      </div>
+                      <span className="review-author">{comment.author}</span>
+                    </div>
+                    <div className="review-rating">
+                      {renderStars(comment.rating || 5)}
+                    </div>
+                    <div className="review-meta">
+                      Reviewed on {new Date(comment.date).toLocaleDateString()}
+                    </div>
+                    <p className="review-text">{comment.text}</p>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
+        </div>
+      </div >
+    </div >
   );
 };
 

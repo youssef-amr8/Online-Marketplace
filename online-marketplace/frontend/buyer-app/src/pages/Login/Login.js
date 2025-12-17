@@ -37,41 +37,77 @@ const Login = () => {
   };
 
   const handleLogin = () => {
-  setTimeout(() => {
-    const users = mockUsers[userType];
-    const user = users.find(u => 
-      u.email === email.trim() && u.password === password
-    );
-    
-    if (user) {
-      // Store user info in localStorage
-      const userData = {
-        email: user.email,
-        name: user.name,
-        type: userType,
-        isAuthenticated: true,
-        token: 'mock-jwt-token-' + Date.now()
-      };
-      
-      localStorage.setItem('user', JSON.stringify(userData));
-      
-      console.log('✅ Login successful!');
-      console.log('📦 User data:', userData);
-      
-      // IMPORTANT: Reset loading state BEFORE navigation
-      setIsLoading(false);
-      
-      // Force a small delay to ensure state updates
-      setTimeout(() => {
-        console.log('🚀 Navigating to /marketplace...');
-        navigate('/marketplace'); // Make sure this matches your App.js route
-      }, 100);
-      
-    } else {
+    setTimeout(() => {
+      // Check for passwords stored separately (persists after logout)
+      const userPasswords = JSON.parse(localStorage.getItem('userPasswords') || '{}');
+      const storedPassword = userPasswords[email.trim()];
+
+      if (storedPassword) {
+        // User has a custom password set
+        if (storedPassword === password) {
+          // Password matches
+          const userData = {
+            email: email.trim(),
+            name: email.split('@')[0], // Use email prefix as name
+            type: userType,
+            isAuthenticated: true,
+            token: 'mock-jwt-token-' + Date.now(),
+            password: storedPassword
+          };
+
+          localStorage.setItem('user', JSON.stringify(userData));
+
+          console.log('✅ Login successful (with custom password)!');
+          console.log('📦 User data:', userData);
+
+          setIsLoading(false);
+
+          setTimeout(() => {
+            console.log('🚀 Navigating to /marketplace...');
+            navigate('/marketplace');
+          }, 100);
+          return;
+        } else {
+          // Wrong password
+          setError('Invalid email or password');
+          setIsLoading(false);
+          return;
+        }
+      }
+
+      // No custom password, check mock users
+      const users = mockUsers[userType];
+      const user = users.find(u =>
+        u.email === email.trim() && u.password === password
+      );
+
+      if (user) {
+        const userData = {
+          email: user.email,
+          name: user.name,
+          type: userType,
+          isAuthenticated: true,
+          token: 'mock-jwt-token-' + Date.now()
+        };
+
+        localStorage.setItem('user', JSON.stringify(userData));
+
+        console.log('✅ Login successful!');
+        console.log('📦 User data:', userData);
+
+        setIsLoading(false);
+
+        setTimeout(() => {
+          console.log('🚀 Navigating to /marketplace...');
+          navigate('/marketplace');
+        }, 100);
+        return;
+      }
+
+      // If we get here, login failed
       setError('Invalid email or password');
       setIsLoading(false);
-    }
-  }, 1000);
+    }, 1000);
   };
 
   const handleSignup = () => {
@@ -103,7 +139,7 @@ const Login = () => {
     setTimeout(() => {
       // Check if user already exists
       const existingUser = mockUsers[userType].find(u => u.email === email.trim());
-      
+
       if (existingUser) {
         setError('User with this email already exists');
         setIsLoading(false);
@@ -128,11 +164,11 @@ const Login = () => {
 
       // Show success message
       alert(`Account created successfully! Welcome ${newUser.name}`);
-      
+
       // REDIRECT TO MarketPlace PAGE
       console.log('Signup successful! Redirecting to MarketPlace...');
       navigate('/marketplace');
-      
+
     }, 1000);
   };
 
@@ -153,17 +189,17 @@ const Login = () => {
         <p className="login-subtitle">
           {isSignup ? 'Sign up to get started' : 'Please enter your credentials to continue'}
         </p>
-        
+
         {/* User Type Selector */}
         <div className="user-type-selector">
-          <button 
+          <button
             type="button"
             className={`user-type-btn ${userType === 'buyer' ? 'active' : ''}`}
             onClick={() => setUserType('buyer')}
           >
             <i className="fas fa-shopping-cart"></i> Buyer
           </button>
-          <button 
+          <button
             type="button"
             className={`user-type-btn ${userType === 'seller' ? 'active' : ''}`}
             onClick={() => setUserType('seller')}
@@ -243,14 +279,14 @@ const Login = () => {
             </div>
           )}
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="login-btn"
             disabled={isLoading}
           >
             {isLoading ? (
               <>
-                <i className="fas fa-spinner fa-spin"></i> 
+                <i className="fas fa-spinner fa-spin"></i>
                 {isSignup ? 'Creating Account...' : 'Signing in...'}
               </>
             ) : (
@@ -265,7 +301,7 @@ const Login = () => {
         <div className="toggle-form">
           <p>
             {isSignup ? 'Already have an account?' : "Don't have an account?"}
-            <button 
+            <button
               type="button"
               className="toggle-btn"
               onClick={() => {

@@ -1,106 +1,123 @@
 // src/pages/CategoryPage.jsx
 import React, { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useLocation } from "react-router-dom";
+import ProductCard from "../components/common/ProductCard";
+import { products, getProductsByCategory } from "../data/products";
 import { categories } from "../data/categories";
-import { getProductsByCategory } from "../data/products";
 import "./CategoryPage.css";
 
 const CategoryPage = () => {
   const { categorySlug, subcategorySlug, childSlug } = useParams();
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [selectedSubcategory, setSelectedSubcategory] = useState(null);
-  const [selectedChild, setSelectedChild] = useState(null);
-  const [products, setProducts] = useState([]);
+  const location = useLocation();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [productsData, setProductsData] = useState([]);
   const [currentSubcategories, setCurrentSubcategories] = useState([]);
-  const [filters, setFilters] = useState({
-    price: "all",
-    rating: [],
-    sortBy: "featured",
-  });
-  const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 12;
+  const [categoryName, setCategoryName] = useState("");
+  const [sortBy, setSortBy] = useState("featured");
+  const [priceFilter, setPriceFilter] = useState("all");
+  const [selectedBrands, setSelectedBrands] = useState([]);
 
   useEffect(() => {
-    const category = categories.find((cat) => cat.slug === categorySlug);
-    setSelectedCategory(category);
+    const params = new URLSearchParams(location.search);
+    const query = params.get("q");
 
-    if (category) {
-      if (subcategorySlug) {
-        const subcategory = category.subcategories.find(
-          (sub) => sub.slug === subcategorySlug
-        );
-        setSelectedSubcategory(subcategory);
+    if (location.pathname === "/search" && query) {
+      setSearchQuery(query);
+      setCategoryName(`Search Results for "${query}"`);
+      setCurrentSubcategories([]);
 
-        if (childSlug && subcategory?.children) {
-          const child = subcategory.children.find(
-            (child) => child.slug === childSlug
+      let allProducts = [];
+      Object.values(products).forEach(arr => {
+        allProducts = [...allProducts, ...arr];
+      });
+
+      const lowerQuery = query.toLowerCase();
+      const filtered = allProducts.filter(p =>
+        p.name.toLowerCase().includes(lowerQuery)
+      );
+      setProductsData(filtered);
+
+    } else if (categorySlug) {
+      window.scrollTo(0, 0);
+      setSearchQuery("");
+
+      const category = categories.find((c) => c.slug === categorySlug);
+
+      if (category) {
+        setCategoryName(category.name);
+
+        if (childSlug) {
+          setCategoryName(
+            category.subcategories
+              .find((s) => s.slug === subcategorySlug)
+              ?.children.find((c) => c.slug === childSlug)?.name || category.name
           );
-          setSelectedChild(child);
-          const productsData = getProductsByCategory(childSlug);
-          setProducts(productsData);
+          setProductsData(getProductsByCategory(childSlug));
           setCurrentSubcategories([]);
-        } else if (subcategory?.children && !childSlug) {
-          setSelectedChild(null);
-          setCurrentSubcategories(subcategory.children);
-          setProducts([]);
-        } else if (subcategory && !subcategory.children) {
-          setSelectedChild(null);
-          setCurrentSubcategories([]);
-          const productsData = getProductsByCategory(subcategorySlug);
-          setProducts(productsData);
+        } else if (subcategorySlug) {
+          const sub = category.subcategories.find((s) => s.slug === subcategorySlug);
+          setCategoryName(sub?.name || category.name);
+
+          if (sub?.children) {
+            setCurrentSubcategories(sub.children);
+            setProductsData([]);
+          } else {
+            setProductsData(getProductsByCategory(subcategorySlug));
+            setCurrentSubcategories([]);
+          }
+        } else {
+          setCurrentSubcategories(category.subcategories);
+          setProductsData([]);
         }
-      } else {
-        setSelectedSubcategory(null);
-        setSelectedChild(null);
-        setCurrentSubcategories(category.subcategories);
-        setProducts([]);
       }
     }
-  }, [categorySlug, subcategorySlug, childSlug]);
+  }, [categorySlug, subcategorySlug, childSlug, location.search, location.pathname]);
 
+  const shouldShowSubcategories = currentSubcategories.length > 0 && productsData.length === 0;
+
+  // Get filtered and sorted products
   const getFilteredProducts = () => {
-    let filtered = [...products];
+    let filtered = [...productsData];
 
-    if (filters.price !== "all") {
-      switch (filters.price) {
-        case "under500":
-          filtered = filtered.filter((p) => p.price < 500);
-          break;
-        case "500-1000":
-          filtered = filtered.filter((p) => p.price >= 500 && p.price <= 1000);
-          break;
-        case "1000-5000":
-          filtered = filtered.filter((p) => p.price >= 1000 && p.price <= 5000);
-          break;
-        case "over5000":
-          filtered = filtered.filter((p) => p.price > 5000);
-          break;
-        default:
-          break;
-      }
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(p =>
+        p.name.toLowerCase().includes(query)
+      );
     }
 
-    if (filters.rating.length > 0) {
-      if (filters.rating.includes("4")) {
-        filtered = filtered.filter((p) => p.rating >= 4);
-      }
-      if (filters.rating.includes("3")) {
-        filtered = filtered.filter((p) => p.rating >= 3);
-      }
+    // Apply price filter
+    if (priceFilter !== "all") {
+      filtered = filtered.filter(p => {
+        const price = p.price;
+        switch (priceFilter) {
+          case "under50": return price < 50;
+          case "50to100": return price >= 50 && price < 100;
+          case "100to200": return price >= 100 && price < 200;
+          case "200plus": return price >= 200;
+          default: return true;
+        }
+      });
     }
 
-    switch (filters.sortBy) {
-      case "price-low-high":
+    // Apply brand filter
+    if (selectedBrands.length > 0) {
+      filtered = filtered.filter(p =>
+        selectedBrands.includes(p.brand || "Other")
+      );
+    }
+
+    // Apply sorting
+    switch (sortBy) {
+      case "priceLowHigh":
         filtered.sort((a, b) => a.price - b.price);
         break;
-      case "price-high-low":
+      case "priceHighLow":
         filtered.sort((a, b) => b.price - a.price);
         break;
       case "rating":
-        filtered.sort((a, b) => b.rating - a.rating);
-        break;
-      case "newest":
-        filtered.sort((a, b) => b.id - a.id);
+        filtered.sort((a, b) => (b.rating || 4) - (a.rating || 4));
         break;
       default:
         break;
@@ -109,436 +126,186 @@ const CategoryPage = () => {
     return filtered;
   };
 
-  const handleFilterChange = (type, value) => {
-    if (type === "price") {
-      setFilters((prev) => ({ ...prev, price: value }));
-      setCurrentPage(1);
-    } else if (type === "rating") {
-      setFilters((prev) => {
-        const newRating = prev.rating.includes(value)
-          ? prev.rating.filter((r) => r !== value)
-          : [...prev.rating, value];
-        return { ...prev, rating: newRating };
-      });
-      setCurrentPage(1);
-    } else if (type === "sort") {
-      setFilters((prev) => ({ ...prev, sortBy: value }));
-    }
-  };
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  const handleBrandToggle = (brand) => {
+    setSelectedBrands(prev =>
+      prev.includes(brand)
+        ? prev.filter(b => b !== brand)
+        : [...prev, brand]
+    );
   };
 
   const filteredProducts = getFilteredProducts();
-  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
-  const startIndex = (currentPage - 1) * productsPerPage;
-  const currentProducts = filteredProducts.slice(
-    startIndex,
-    startIndex + productsPerPage
-  );
-
-  const renderStars = (rating) => {
-    const stars = [];
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 >= 0.5;
-
-    for (let i = 0; i < fullStars; i++) {
-      stars.push(
-        <span key={i} className="star">
-          ★
-        </span>
-      );
-    }
-
-    if (hasHalfStar) {
-      stars.push(
-        <span key="half" className="star">
-          ★
-        </span>
-      );
-    }
-
-    const emptyStars = 5 - stars.length;
-    for (let i = 0; i < emptyStars; i++) {
-      stars.push(
-        <span key={`empty-${i}`} className="star empty">
-          ☆
-        </span>
-      );
-    }
-
-    return stars;
-  };
-
-  const formatPrice = (price) => {
-    return price.toLocaleString("en-EG");
-  };
-
-  if (!selectedCategory) {
-    return <div className="loading">Loading...</div>;
-  }
-
-  const buildBreadcrumb = () => {
-    const breadcrumb = [
-      <Link key="home" to="/">
-        Home
-      </Link>,
-      <span key="sep1"> › </span>,
-      <Link key="category" to={`/category/${categorySlug}`}>
-        {selectedCategory.name}
-      </Link>,
-    ];
-
-    if (selectedSubcategory) {
-      breadcrumb.push(<span key="sep2"> › </span>);
-      if (selectedChild) {
-        breadcrumb.push(
-          <Link
-            key="subcategory"
-            to={`/category/${categorySlug}/${subcategorySlug}`}
-          >
-            {selectedSubcategory.name}
-          </Link>
-        );
-        breadcrumb.push(<span key="sep3"> › </span>);
-        breadcrumb.push(<span key="child">{selectedChild.name}</span>);
-      } else {
-        breadcrumb.push(
-          <span key="subcategory">{selectedSubcategory.name}</span>
-        );
-      }
-    }
-
-    return breadcrumb;
-  };
-
-  const shouldShowSubcategories =
-    currentSubcategories.length > 0 && products.length === 0;
-
-  if (shouldShowSubcategories) {
-    return (
-      <div className="category-page">
-        <div className="breadcrumb">{buildBreadcrumb()}</div>
-
-        <div className="subcategories-container">
-          <h1 className="page-title">
-            {selectedSubcategory
-              ? `${selectedSubcategory.name} Categories`
-              : `${selectedCategory.name} Categories`}
-          </h1>
-
-          <div className="subcategories-grid">
-            {currentSubcategories.map((sub) => {
-              let linkPath;
-              if (selectedSubcategory && selectedSubcategory.children) {
-                linkPath = `/category/${categorySlug}/${subcategorySlug}/${sub.slug}`;
-              } else {
-                linkPath = `/category/${categorySlug}/${sub.slug}`;
-              }
-
-              return (
-                <Link key={sub.id} to={linkPath} className="subcategory-card">
-                  <div className="subcategory-card-image">
-                    <img
-                      src={sub.image}
-                      alt={sub.name}
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = `https://via.placeholder.com/400x300?text=${encodeURIComponent(
-                          sub.name
-                        )}`;
-                      }}
-                    />
-                  </div>
-                  <div className="subcategory-card-content">
-                    <h3 className="subcategory-card-title">{sub.name}</h3>
-                    <span className="subcategory-card-link">Shop Now →</span>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="category-page">
-      <div className="breadcrumb">{buildBreadcrumb()}</div>
+      <div className="breadcrumb">
+        <Link to="/marketplace">Home</Link>
+        <span>/</span>
+        <span>{categoryName}</span>
+      </div>
 
-      <div className="category-content">
-        <aside className="filters-sidebar">
-          <h3>Filters</h3>
-
-          {/* Department Filter */}
-          {selectedCategory && selectedCategory.subcategories && (
-            <div className="filter-section">
-              <h4>Department</h4>
-              <ul className="filter-list">
-                {selectedCategory.subcategories.map((sub) => {
-                  if (sub.children) {
-                    return (
-                      <li key={sub.id}>
-                        <Link
-                          to={`/category/${categorySlug}/${sub.slug}`}
-                          className={
-                            selectedSubcategory?.slug === sub.slug
-                              ? "active"
-                              : ""
-                          }
-                        >
-                          {sub.name}
-                        </Link>
-                        {selectedSubcategory?.slug === sub.slug &&
-                          sub.children && (
-                            <ul className="filter-sublist">
-                              {sub.children.map((child) => (
-                                <li key={child.id}>
-                                  <Link
-                                    to={`/category/${categorySlug}/${sub.slug}/${child.slug}`}
-                                    className={
-                                      selectedChild?.slug === child.slug
-                                        ? "active"
-                                        : ""
-                                    }
-                                  >
-                                    {child.name}
-                                  </Link>
-                                </li>
-                              ))}
-                            </ul>
-                          )}
-                      </li>
-                    );
-                  } else {
-                    return (
-                      <li key={sub.id}>
-                        <Link
-                          to={`/category/${categorySlug}/${sub.slug}`}
-                          className={
-                            selectedSubcategory?.slug === sub.slug
-                              ? "active"
-                              : ""
-                          }
-                        >
-                          {sub.name}
-                        </Link>
-                      </li>
-                    );
-                  }
-                })}
-              </ul>
-            </div>
-          )}
-
-          {/* Price Filter */}
-          <div className="filter-section">
-            <h4>Price</h4>
-            <label>
-              <input
-                type="radio"
-                name="price"
-                value="all"
-                checked={filters.price === "all"}
-                onChange={() => handleFilterChange("price", "all")}
-              />
-              All Prices
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="price"
-                value="under500"
-                checked={filters.price === "under500"}
-                onChange={() => handleFilterChange("price", "under500")}
-              />
-              Under EGP 500
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="price"
-                value="500-1000"
-                checked={filters.price === "500-1000"}
-                onChange={() => handleFilterChange("price", "500-1000")}
-              />
-              EGP 500 - 1,000
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="price"
-                value="1000-5000"
-                checked={filters.price === "1000-5000"}
-                onChange={() => handleFilterChange("price", "1000-5000")}
-              />
-              EGP 1,000 - 5,000
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="price"
-                value="over5000"
-                checked={filters.price === "over5000"}
-                onChange={() => handleFilterChange("price", "over5000")}
-              />
-              Over EGP 5,000
-            </label>
-          </div>
-
-          {/* Rating Filter */}
-          <div className="filter-section">
-            <h4>Customer Review</h4>
-            <label>
-              <input
-                type="checkbox"
-                checked={filters.rating.includes("4")}
-                onChange={() => handleFilterChange("rating", "4")}
-              />
-              <span className="rating-stars">★★★★</span> & Up
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                checked={filters.rating.includes("3")}
-                onChange={() => handleFilterChange("rating", "3")}
-              />
-              <span className="rating-stars">★★★</span> & Up
-            </label>
-          </div>
-        </aside>
-
-        <main className="products-section">
-          <div className="products-header">
-            <h1>
-              {selectedChild
-                ? selectedChild.name
-                : selectedSubcategory
-                ? selectedSubcategory.name
-                : selectedCategory.name}
-            </h1>
-            <div className="sort-options">
-              <label>Sort by:</label>
-              <select
-                value={filters.sortBy}
-                onChange={(e) => handleFilterChange("sort", e.target.value)}
+      {shouldShowSubcategories ? (
+        <div className="subcategories-container">
+          <h2 className="page-title">{categoryName}</h2>
+          <div className="subcategories-grid">
+            {currentSubcategories.map((sub) => (
+              <Link
+                key={sub.id}
+                to={
+                  location.pathname === '/search' ? '#' :
+                    childSlug
+                      ? `/category/${categorySlug}/${subcategorySlug}/${sub.slug}`
+                      : subcategorySlug
+                        ? `/category/${categorySlug}/${subcategorySlug}/${sub.slug}`
+                        : `/category/${categorySlug}/${sub.slug}`
+                }
+                className="subcategory-card"
               >
-                <option value="featured">Featured</option>
-                <option value="price-low-high">Price: Low to High</option>
-                <option value="price-high-low">Price: High to Low</option>
-                <option value="rating">Avg. Customer Review</option>
-                <option value="newest">Newest Arrivals</option>
-              </select>
+                <div className="subcategory-card-image">
+                  <img src={sub.image || "https://images.unsplash.com/photo-1546868871-7041f2a55e12?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"} alt={sub.name} />
+                </div>
+                <div className="subcategory-card-content">
+                  <h3 className="subcategory-card-title">{sub.name}</h3>
+                  <span className="subcategory-card-link">Shop Now</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="category-content">
+          {/* Sidebar Filters */}
+          <div className="filters-sidebar">
+            <h3>Filters</h3>
+
+            <div className="filter-section">
+              <h4>Price</h4>
+              <div className="filter-list">
+                <label>
+                  <input
+                    type="radio"
+                    name="price"
+                    checked={priceFilter === "all"}
+                    onChange={() => setPriceFilter("all")}
+                  /> All Prices
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    name="price"
+                    checked={priceFilter === "under50"}
+                    onChange={() => setPriceFilter("under50")}
+                  /> Under $50
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    name="price"
+                    checked={priceFilter === "50to100"}
+                    onChange={() => setPriceFilter("50to100")}
+                  /> $50 to $100
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    name="price"
+                    checked={priceFilter === "100to200"}
+                    onChange={() => setPriceFilter("100to200")}
+                  /> $100 to $200
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    name="price"
+                    checked={priceFilter === "200plus"}
+                    onChange={() => setPriceFilter("200plus")}
+                  /> $200 & Above
+                </label>
+              </div>
+            </div>
+
+            <div className="filter-section">
+              <h4>Brand</h4>
+              <div className="filter-list">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={selectedBrands.includes("Samsung")}
+                    onChange={() => handleBrandToggle("Samsung")}
+                  /> Samsung
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={selectedBrands.includes("Apple")}
+                    onChange={() => handleBrandToggle("Apple")}
+                  /> Apple
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={selectedBrands.includes("Sony")}
+                    onChange={() => handleBrandToggle("Sony")}
+                  /> Sony
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={selectedBrands.includes("LG")}
+                    onChange={() => handleBrandToggle("LG")}
+                  /> LG
+                </label>
+              </div>
             </div>
           </div>
 
-          <div className="products-count">
-            {filteredProducts.length}{" "}
-            {filteredProducts.length === 1 ? "product" : "products"} found
-          </div>
+          {/* Products Section */}
+          <div className="products-section">
+            <div className="products-header">
+              <h1>{categoryName}</h1>
+              <div className="sort-options">
+                <label>Sort by:</label>
+                <select value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+                  <option value="featured">Featured</option>
+                  <option value="priceLowHigh">Price: Low to High</option>
+                  <option value="priceHighLow">Price: High to Low</option>
+                  <option value="rating">Avg. Customer Review</option>
+                </select>
+              </div>
+            </div>
 
-          <div className="products-grid">
-            {currentProducts.length > 0 ? (
-              currentProducts.map((product) => (
-                <Link
-                  to={`/product/${product.id}`}
-                  key={product.id}
-                  className="product-card"
-                  style={{ textDecoration: "none", color: "inherit" }}
-                >
-                  <div className="product-image">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = `https://via.placeholder.com/200x200?text=Product`;
-                      }}
-                    />
-                  </div>
-                  <div className="product-info">
-                    <h3 className="product-title">{product.name}</h3>
-                    <div className="product-rating">
-                      <span className="stars">
-                        {renderStars(product.rating)}
-                      </span>
-                      <span className="review-count">
-                        ({product.reviewCount})
-                      </span>
-                    </div>
-                    <div className="product-price">
-                      <span className="current-price">
-                        EGP {formatPrice(product.price)}
-                      </span>
-                      {product.originalPrice > product.price && (
-                        <span className="original-price">
-                          EGP {formatPrice(product.originalPrice)}
-                        </span>
-                      )}
-                    </div>
-                    <p className="delivery-info">{product.delivery}</p>
-                    <div className="product-brand">
-                      <span className="brand-tag">Brand: {product.brand}</span>
-                    </div>
-                  </div>
-                </Link>
-              ))
-            ) : (
-              <div className="no-products">
-                <p>No products found. Try adjusting your filters.</p>
+            {/* Local Search within Category */}
+            {location.pathname !== '/search' && (
+              <div className="category-search-bar">
+                <input
+                  type="text"
+                  className="category-search-input"
+                  placeholder={`Search in ${categoryName}...`}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
               </div>
             )}
-          </div>
 
-          {totalPages > 1 && (
-            <div className="pagination">
-              <button
-                className="pagination-btn"
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-              >
-                Previous
-              </button>
-
-              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                let pageNum;
-                if (totalPages <= 5) {
-                  pageNum = i + 1;
-                } else if (currentPage <= 3) {
-                  pageNum = i + 1;
-                } else if (currentPage >= totalPages - 2) {
-                  pageNum = totalPages - 4 + i;
-                } else {
-                  pageNum = currentPage - 2 + i;
-                }
-
-                return (
-                  <button
-                    key={pageNum}
-                    className={`pagination-btn ${
-                      currentPage === pageNum ? "active" : ""
-                    }`}
-                    onClick={() => handlePageChange(pageNum)}
-                  >
-                    {pageNum}
-                  </button>
-                );
-              })}
-
-              <button
-                className="pagination-btn"
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-              >
-                Next
-              </button>
+            <div className="products-grid">
+              {filteredProducts.length > 0 ? (
+                filteredProducts.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))
+              ) : (
+                <div className="no-products">
+                  <p>No products found matching your criteria.</p>
+                  <button onClick={() => {
+                    setSearchQuery("");
+                    setPriceFilter("all");
+                    setSelectedBrands([]);
+                  }} className="amazon-btn amazon-btn-secondary">Clear Filters</button>
+                </div>
+              )}
             </div>
-          )}
-        </main>
-      </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
