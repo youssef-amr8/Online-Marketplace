@@ -196,7 +196,7 @@
 }
 
 /* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 769px) {
   .dashboard-content {
     margin-left: 0;
     padding-top: 0;
